@@ -919,11 +919,6 @@ protected:
      */
     gr::thread::mutex d_setlock;
 
-    /*! Used by blocks to access the logger system.
-     */
-    gr::logger_ptr d_logger;
-    gr::logger_ptr d_debug_logger;
-
     // These are really only for internal use, but leaving them public avoids
     // having to work up an ever-varying list of friend GR_RUNTIME_APIs
 
@@ -955,7 +950,7 @@ typedef std::vector<block_sptr>::iterator block_viter_t;
 
 inline block_sptr cast_to_block_sptr(basic_block_sptr p)
 {
-    return boost::dynamic_pointer_cast<block, basic_block>(p);
+    return std::dynamic_pointer_cast<block, basic_block>(p);
 }
 
 GR_RUNTIME_API std::ostream& operator<<(std::ostream& os, const block* m);

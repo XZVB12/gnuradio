@@ -20,6 +20,7 @@ namespace digital {
 /*!
  * \brief Implements constant modulus adaptive filter on complex stream.
  * \ingroup equalizers_blk
+ * \ingroup deprecated_blk
  *
  * \details
  * The error value and tap update equations (for p=2) can be found in:
@@ -37,7 +38,7 @@ protected:
 
 public:
     // gr::digital::cma_equalizer_cc::sptr
-    typedef boost::shared_ptr<cma_equalizer_cc> sptr;
+    typedef std::shared_ptr<cma_equalizer_cc> sptr;
 
     /*!
      * Make a CMA Equalizer block

@@ -31,7 +31,7 @@ private:
     friend GR_RUNTIME_API top_block_sptr make_top_block(const std::string& name,
                                                         bool catch_exceptions);
 
-    top_block_impl* d_impl;
+    std::unique_ptr<top_block_impl> d_impl;
 
 protected:
     top_block(const std::string& name, bool catch_exceptions = true);
@@ -134,7 +134,7 @@ public:
 
 inline top_block_sptr cast_to_top_block_sptr(basic_block_sptr block)
 {
-    return boost::dynamic_pointer_cast<top_block, basic_block>(block);
+    return std::dynamic_pointer_cast<top_block, basic_block>(block);
 }
 
 } // namespace gr

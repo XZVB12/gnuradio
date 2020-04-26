@@ -132,7 +132,6 @@ class Application(Gtk.Application):
                     main.new_page(file_path, show=file_path_to_show == file_path)
             if not main.current_page:
                 main.new_page()  # ensure that at least a blank page exists
-                main.current_page.saved = False
 
             main.btwin.search_entry.hide()
 
@@ -442,6 +441,8 @@ class Application(Gtk.Application):
             Dialogs.show_help(main)
         elif action == Actions.TYPES_WINDOW_DISPLAY:
             Dialogs.show_types(main)
+        elif action == Actions.KEYBOARD_SHORTCUTS_WINDOW_DISPLAY:
+            Dialogs.show_keyboard_shortcuts(main)   
         elif action == Actions.ERRORS_WINDOW_DISPLAY:
             Dialogs.ErrorsDialog(main, flow_graph).run_and_destroy()
         elif action == Actions.TOGGLE_CONSOLE_WINDOW:
@@ -594,7 +595,6 @@ class Application(Gtk.Application):
         ##################################################
         elif action == Actions.FLOW_GRAPH_NEW:
             main.new_page()
-            main.current_page.saved = False
             args = (GLib.Variant('s', 'qt_gui'),)
             flow_graph = main.current_page.flow_graph
             flow_graph.options_block.params['generate_options'].set_value(str(args[0])[1:-1])

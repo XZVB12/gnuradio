@@ -86,7 +86,7 @@ class GR_RUNTIME_API block_gateway : virtual public gr::block
 {
 public:
     // gr::block_gateway::sptr
-    typedef boost::shared_ptr<block_gateway> sptr;
+    typedef std::shared_ptr<block_gateway> sptr;
 
     /*!
      * Make a new gateway block.
@@ -115,6 +115,18 @@ public:
     unsigned block__history(void) const { return gr::block::history(); }
 
     void block__set_history(unsigned history) { return gr::block::set_history(history); }
+
+    void block__set_block_alias(std::string alias)
+    {
+        return gr::block::set_block_alias(alias);
+    }
+
+    std::string block__alias(void) const { return gr::block::alias(); }
+
+    void block__set_processor_affinity(std::vector<int> mask)
+    {
+        return gr::block::set_processor_affinity(mask);
+    }
 
     void block__set_fixed_rate(bool fixed_rate)
     {

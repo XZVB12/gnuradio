@@ -50,10 +50,12 @@ set(GR_SWIG_MIN_VERSION "3.0.8")
 set(GR_CMAKE_MIN_VERSION "3.5.1")
 set(GR_MAKO_MIN_VERSION "0.4.2")
 set(GR_PYTHON_MIN_VERSION "3.6.5")
+set(GR_NUMPY_MIN_VERSION "1.13.0")
 set(GCC_MIN_VERSION "4.8.4")
 set(CLANG_MIN_VERSION "3.4.0")
 set(APPLECLANG_MIN_VERSION "500")
 set(MSVC_MIN_VERSION "1800")
+set(VOLK_MIN_VERSION "2.1.0")
 
 # Enable generation of compile_commands.json for code completion engines
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -166,6 +168,12 @@ include(CMakeOverloads)
 # Compiler specific setup
 ########################################################################
 include(GrMiscUtils) #compiler flag check
+
+include(TestBigEndian)
+TEST_BIG_ENDIAN(GR_IS_BIG_ENDIAN)
+if(GR_IS_BIG_ENDIAN)
+    add_definitions(-DGR_IS_BIG_ENDIAN)
+endif(GR_IS_BIG_ENDIAN)
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR
    CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
@@ -330,6 +338,11 @@ include(GrBoost)
 ########################################################################
 include(GrPython)
 GR_PYTHON_CHECK_MODULE("six - python 2 and 3 compatibility library" six "True" SIX_FOUND)
+GR_PYTHON_CHECK_MODULE(
+    "numpy"
+    numpy
+    "LooseVersion(numpy.__version__) >= LooseVersion('${GR_NUMPY_MIN_VERSION}')"
+    NUMPY_FOUND)
 find_package(SWIG)
 
 if(SWIG_FOUND)
@@ -346,6 +359,7 @@ GR_REGISTER_COMPONENT("python-support" ENABLE_PYTHON
     SWIG_FOUND
     SWIG_VERSION_CHECK
     SIX_FOUND
+    NUMPY_FOUND
 )
 
 if(${CMAKE_BUILD_TYPE} STREQUAL "Coverage")
@@ -355,67 +369,26 @@ endif()
 
 
 ########################################################################
-# Setup volk as a subproject
+# Detect and configure VOLK
 ########################################################################
 message(STATUS "")
 message(STATUS "Configuring VOLK support...")
-
-OPTION(ENABLE_INTERNAL_VOLK "Enable internal VOLK only" ON)
-UNSET(Volk_FOUND)
-if(NOT ENABLE_INTERNAL_VOLK)
-    find_package(Volk)
-    set(GR_VOLK_LIB "Volk::volk")
-    if(NOT Volk_FOUND)
-        message(STATUS "  External VOLK not found; checking internal.")
-    endif()
-endif()
-if(NOT Volk_FOUND)
-    find_file(INTREE_VOLK_FOUND
-        volk/volk_common.h
-        PATHS ${CMAKE_CURRENT_SOURCE_DIR}/volk/include
-        NO_DEFAULT_PATH
-        NO_CMAKE_FIND_ROOT_PATH
-    )
-
-    if(NOT INTREE_VOLK_FOUND)
-        message(STATUS "  VOLK submodule is not checked out.")
-        message(STATUS "  To check out the VOLK submodule, use:")
-        message(STATUS "    git pull --recurse-submodules=on")
-        message(STATUS "    git submodule update --init")
-        if(ENABLE_INTERNAL_VOLK)
-            message(STATUS "  External VOLK disabled.")
-        endif()
-        message(STATUS "  Override with -DENABLE_INTERNAL_VOLK=ON/OFF")
-        message(STATUS "")
-        message(FATAL_ERROR "VOLK required but not found.")
-    endif()
-
-    add_subdirectory(volk)
-    # if the above command returns, then VOLK is enabled
-
-    include(GrComponent)
-    GR_REGISTER_COMPONENT("volk" ENABLE_VOLK)
-
-    SET(VOLK_INCLUDE_DIRS
-        ${CMAKE_CURRENT_SOURCE_DIR}/volk/include
-        ${CMAKE_CURRENT_BINARY_DIR}/volk/include
-    )
-
-    set(GR_VOLK_LIB "volk")
-
-    SET(VOLK_INSTALL_LIBRARY_DIR ${CMAKE_INSTALL_PREFIX}/lib)
-    SET(VOLK_INSTALL_INCLUDE_DIR ${CMAKE_INSTALL_PREFIX}/include)
+find_package(Volk REQUIRED)
+message(STATUS "  Found VOLK:")
+message(STATUS "  * Version: ${VOLK_VERSION}")
+message(STATUS "  * Libraries: ${VOLK_LIBRARIES}")
+message(STATUS "  * Includes: ${VOLK_INCLUDE_DIRS}")
+if("${VOLK_VERSION}" STREQUAL "")
+  message(WARNING "Empty VOLK version string. Assuming compatibility. Good luck!")
 else()
-    message(STATUS "  An external VOLK has been found and will be used for build.")
-    SET(ENABLE_VOLK TRUE)
+  if("${VOLK_VERSION}" VERSION_LESS ${VOLK_MIN_VERSION})
+    message(FATAL_ERROR "VOLK version ${VOLK_VERSION} < ${VOLK_MIN_VERSION}")
+  endif()
+endif()
 
-    get_filename_component(VOLK_INSTALL_LIBRARY_DIR "${VOLK_LIBRARIES}" DIRECTORY)
-    SET(VOLK_INSTALL_INCLUDE_DIR ${VOLK_INCLUDE_DIRS})
-endif(NOT Volk_FOUND)
-
-message(STATUS "  Override with -DENABLE_INTERNAL_VOLK=ON/OFF")
-
-# Handle logging
+########################################################################
+# Configure Log4CPP
+########################################################################
 find_package(LOG4CPP REQUIRED)
 
 ########################################################################
@@ -499,6 +472,7 @@ add_subdirectory(gr-video-sdl)
 add_subdirectory(gr-vocoder)
 add_subdirectory(gr-wavelet)
 add_subdirectory(gr-zeromq)
+add_subdirectory(gr-network)
 
 # Defining GR_CTRLPORT for gnuradio/config.h
 if(ENABLE_GR_CTRLPORT)

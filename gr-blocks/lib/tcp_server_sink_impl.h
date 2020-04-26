@@ -22,7 +22,7 @@ namespace blocks {
 class tcp_server_sink_impl : public tcp_server_sink
 {
 private:
-    size_t d_itemsize;
+    const size_t d_itemsize;
 
     boost::asio::io_service d_io_service;
     gr::thread::thread d_io_serv_thread;
@@ -31,7 +31,7 @@ private:
     std::set<boost::asio::ip::tcp::socket*> d_sockets;
     boost::asio::ip::tcp::acceptor d_acceptor;
 
-    boost::shared_ptr<uint8_t[]> d_buf;
+    std::shared_ptr<uint8_t[]> d_buf;
     enum {
         BUF_SIZE = 256 * 1024,
     };

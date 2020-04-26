@@ -22,9 +22,9 @@ class delay_impl : public delay
 private:
     void forecast(int noutput_items, gr_vector_int& ninput_items_required);
 
-    size_t d_itemsize;
+    const size_t d_itemsize;
     int d_delta;
-    gr::thread::mutex d_mutex_delay;
+    void handle_msg(pmt::pmt_t msg);
 
 public:
     delay_impl(size_t itemsize, int delay);

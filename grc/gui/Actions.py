@@ -13,6 +13,7 @@ import logging
 
 from gi.repository import Gtk, Gdk, Gio, GLib, GObject
 
+from . import Utils
 
 log = logging.getLogger(__name__)
 
@@ -125,7 +126,10 @@ class Action(Gio.SimpleAction):
         self.label = label
         self.tooltip = tooltip
         self.icon_name = icon_name
-        self.keypresses = keypresses
+        if keypresses:
+            self.keypresses = [kp.replace("<Ctrl>", Utils.get_modifier_key(True)) for kp in keypresses]
+        else:
+            self.keypresses = None
         self.prefix = prefix
         self.preference_name = preference_name
         self.default = default
@@ -480,7 +484,8 @@ TOGGLE_BLOCKS_WINDOW = actions.register("win.toggle_blocks_window",
 TOGGLE_SCROLL_LOCK = actions.register("win.console.scroll_lock",
     label='Console Scroll _Lock',
     tooltip='Toggle scroll lock for the console window',
-    preference_name='scroll_lock'
+    preference_name='scroll_lock',
+    keypresses=["Scroll_Lock"],
 )
 ABOUT_WINDOW_DISPLAY = actions.register("app.about",
     label='_About',
@@ -497,6 +502,12 @@ TYPES_WINDOW_DISPLAY = actions.register("app.types",
     label='_Types',
     tooltip='Types color mapping',
     icon_name='dialog-information',
+)
+KEYBOARD_SHORTCUTS_WINDOW_DISPLAY = actions.register("app.keys",
+    label='_Keys',
+    tooltip='Keyboard - Shortcuts',
+    icon_name='dialog-information',
+    keypresses=["<Ctrl>K"],
 )
 FLOW_GRAPH_GEN = actions.register("app.flowgraph.generate",
     label='_Generate',
@@ -549,11 +560,13 @@ CLEAR_CONSOLE = actions.register("win.console.clear",
     label='_Clear Console',
     tooltip='Clear Console',
     icon_name='edit-clear',
+    keypresses=["<Ctrl>l"],
 )
 SAVE_CONSOLE = actions.register("win.console.save",
     label='_Save Console',
     tooltip='Save Console',
     icon_name='edit-save',
+    keypresses=["<Ctrl><Shift>p"],
 )
 OPEN_HIER = actions.register("win.open_hier",
     label='Open H_ier',

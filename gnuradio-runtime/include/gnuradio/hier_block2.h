@@ -40,13 +40,16 @@ private:
                      gr::io_signature::sptr output_signature);
 
     /*!
-     * \brief Private implementation details of gr::hier_block2
+     * \brief Private implementation details of gr::hier_block2.
+     *
+     * This is a pointer in order to not break ABI when implementation object
+     * changes.
      */
-    hier_block2_detail* d_detail;
+    std::unique_ptr<hier_block2_detail> d_detail;
 
 
 protected:
-    hier_block2(void) {} // allows pure virtual interface sub-classes
+    hier_block2(); // allows pure virtual interface sub-classes
     hier_block2(const std::string& name,
                 gr::io_signature::sptr input_signature,
                 gr::io_signature::sptr output_signature);
@@ -319,7 +322,7 @@ GR_RUNTIME_API std::string dot_graph(hier_block2_sptr hierblock2);
 
 inline hier_block2_sptr cast_to_hier_block2_sptr(basic_block_sptr block)
 {
-    return boost::dynamic_pointer_cast<hier_block2, basic_block>(block);
+    return std::dynamic_pointer_cast<hier_block2, basic_block>(block);
 }
 
 } /* namespace gr */
