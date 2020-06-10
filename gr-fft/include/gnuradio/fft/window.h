@@ -211,9 +211,20 @@ public:
     static std::vector<float> nuttal_cfd(int ntaps);
 
     /*!
-     * \brief Build a flat top window.
+     * \brief Build a flat top window per the SRS specification
      *
-     * See: http://en.wikipedia.org/wiki/Window_function#Flat_top_window
+     * See:
+     * <pre>
+     *     Stanford Research Systems, "Model SR785 Dynamic Signal
+     *     Analyzer: Operating Manual and Programming Reference,"
+     *     2017, pp 2-13
+     * </pre>
+     *
+     * Note: there are many flat top windows, and this implementation is different from
+     * SciPY and Matlab which use the coefficients from D’Antona et al. "Digital Signal
+     * Processing for Measurement Systems" with the following cosine coefficients: <pre>
+     *     [0.21557895, 0.41663158, 0.277263158, 0.083578947, 0.006947368]
+     * </pre>
      *
      * \param ntaps Number of coefficients in the window.
      */
@@ -286,6 +297,31 @@ public:
      * \param ntaps Number of coefficients in the window.
      */
     static std::vector<float> riemann(int ntaps);
+
+    /*!
+     * \brief Build a Tukey window.
+     * <pre>
+     * Bloomfield, P. Fourier Analysis of Time Series: An Introduction. New York:
+     * Wiley-Interscience, 2000, pp 69 (eqn 6.9)
+     * </pre>
+     *
+     * \param ntaps Number of coefficients in the window.
+     * \param alpha Shaping parameter for the Tukey window, an
+     *        alpha of zero is equivalent to a rectangular
+     *        window, an alpha of 1 is equivalent to Hann.
+     */
+    static std::vector<float> tukey(int ntaps, float alpha);
+
+    /*!
+     * \brief Build a Gaussian window using the equation
+     * <pre>
+     * exp(-(1/2) * (n/sigma)^2)
+     * </pre>
+     *
+     * \param ntaps Number of coefficients in the window.
+     * \param sigma Standard deviation of gaussian distribution.
+     */
+    static std::vector<float> gaussian(int ntaps, float sigma);
 
     /*!
      * \brief Build a window using gr::fft::win_type to index the

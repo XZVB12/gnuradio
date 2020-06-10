@@ -135,11 +135,11 @@ class TextDisplay(SimpleTextDisplay):
         lock.set_active(self.scroll_lock)
         lock.connect('activate', self.scroll_back_cb, view)
 
-        save = Gtk.ImageMenuItem(label = Gtk.STOCK_SAVE)
+        save = Gtk.ImageMenuItem(label = "Save Console")
         menu.append(save)
         save.connect('activate', self.save_cb, view)
 
-        clear = Gtk.ImageMenuItem(label = Gtk.STOCK_CLEAR)
+        clear = Gtk.ImageMenuItem(label = "Clear Console")
         menu.append(clear)
         clear.connect('activate', self.clear_cb, view)
         menu.show_all()
@@ -336,6 +336,22 @@ def show_keyboard_shortcuts(parent):
     ).run_and_destroy()
 
 
+def show_get_involved(parent):
+    """Get Involved Instructions"""
+    markup = textwrap.dedent("""\
+    <tt><b>Welcome to GNU Radio Community!</b></tt>
+    \n\
+    <tt>For more details on contributing to GNU Radio and getting engaged with our great community visit </tt><a href="https://www.gnuradio.org/get-involved">here</a>.     
+    \n\
+    <tt>You can also join our <a href="https://slack.gnuradio.org/">Slack Channel</a>, IRC Channel (#gnuradio) or contact through our <a href="https://lists.gnu.org/mailman/listinfo/discuss-gnuradio">mailing list(discuss-gnuradio)</a></tt>. 
+    \
+    """)
+    
+    MessageDialogWrapper(
+        parent, Gtk.MessageType.QUESTION, Gtk.ButtonsType.CLOSE, title='Get - Involved', markup=markup
+    ).run_and_destroy()   
+
+
 def show_types(parent):
     """ Display information about standard data types. """
     colors = [(name, color) for name, key, sizeof, color in Constants.CORE_TYPES]
@@ -349,7 +365,7 @@ def show_types(parent):
 
     MessageDialogWrapper(
         parent, Gtk.MessageType.INFO, Gtk.ButtonsType.CLOSE, title='Types - Color Mapping', markup=message
-    ).run_and_destroy()
+    ).run_and_destroy() 
 
 
 def show_missing_xterm(parent, xterm):
