@@ -14,7 +14,7 @@ endif()
 if(ENABLE_DOXYGEN)
     add_custom_command( 
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/docstring_status
-        COMMAND python3 ${CMAKE_SOURCE_DIR}/docs/doxygen/update_pydoc.py "sub"
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/docs/doxygen/update_pydoc.py "sub"
         "--json_path" ${CMAKE_BINARY_DIR}/docs/doxygen/gnuradio_docstrings.json
         "--bindings_dir" ${CMAKE_CURRENT_SOURCE_DIR}/docstrings
         "--output_dir" ${CMAKE_CURRENT_BINARY_DIR}
@@ -25,7 +25,7 @@ if(ENABLE_DOXYGEN)
 else(ENABLE_DOXYGEN)
     add_custom_command( 
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/docstring_status
-        COMMAND python3 ${CMAKE_SOURCE_DIR}/docs/doxygen/update_pydoc.py "copy"
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/docs/doxygen/update_pydoc.py "copy"
         "--bindings_dir" ${CMAKE_CURRENT_SOURCE_DIR}/docstrings
         "--output_dir" ${CMAKE_CURRENT_BINARY_DIR}
         COMMENT "Copying ${name} docstring templates as pybind headers ...")
@@ -52,8 +52,8 @@ configure_file(${CMAKE_SOURCE_DIR}/docs/doxygen/pydoc_macros.h ${CMAKE_CURRENT_B
 
 list(APPEND regen_targets "")
 foreach(file ${files})
-   
-    execute_process(COMMAND "python3" 
+
+    execute_process(COMMAND "${PYTHON_EXECUTABLE}"
     ${CMAKE_SOURCE_DIR}/gr-utils/bindtool/scripts/header_utils.py
     "all"
     ${CMAKE_CURRENT_SOURCE_DIR}/${file}
@@ -93,7 +93,7 @@ foreach(file ${files})
                 # Automatically regenerate the bindings               
                 add_custom_command( 
                     OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}}/${file}
-                    COMMAND  "python3" 
+                    COMMAND  "${PYTHON_EXECUTABLE}"
                     ${CMAKE_SOURCE_DIR}/gr-utils/bindtool/scripts/bind_intree_file.py
                     "--output_dir" ${CMAKE_CURRENT_SOURCE_DIR}/..
                     "--prefix" ${CMAKE_INSTALL_PREFIX}
@@ -125,9 +125,9 @@ endif()
 
 
 if(ENABLE_DOXYGEN)
-    add_custom_command( 
+    add_custom_command(
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/docstring_status
-        COMMAND python3 ${CMAKE_SOURCE_DIR}/docs/doxygen/update_pydoc.py "sub"
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/docs/doxygen/update_pydoc.py "sub"
         "--json_path" ${CMAKE_BINARY_DIR}/docs/doxygen/gnuradio_docstrings.json
         "--bindings_dir" ${CMAKE_CURRENT_SOURCE_DIR}/docstrings
         "--output_dir" ${CMAKE_CURRENT_BINARY_DIR}
@@ -136,9 +136,9 @@ if(ENABLE_DOXYGEN)
         DEPENDS gnuradio_docstrings)
     add_custom_target(${name}_docstrings ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/docstring_status)
 else(ENABLE_DOXYGEN)
-    add_custom_command( 
+    add_custom_command(
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/docstring_status
-        COMMAND python3 ${CMAKE_SOURCE_DIR}/docs/doxygen/update_pydoc.py "copy"
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/docs/doxygen/update_pydoc.py "copy"
         "--bindings_dir" ${CMAKE_CURRENT_SOURCE_DIR}/docstrings
         "--output_dir" ${CMAKE_CURRENT_BINARY_DIR}
         COMMENT "Copying ${name} docstring templates as pybind headers ...")
@@ -154,6 +154,9 @@ target_include_directories(${name}_python PUBLIC
 )
 target_link_libraries(${name}_python PUBLIC ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} gnuradio-${MODULE_NAME})
 target_compile_options(${name}_python PRIVATE -Wno-unused-variable) # disable warnings for docstring templates
+if(NOT SNDFILE_FOUND AND ${name} STREQUAL blocks)
+    target_compile_options(${name}_python PRIVATE -DNO_WAVFILE)
+endif()
 add_dependencies(${name}_python ${name}_docstrings ${regen_targets}) 
 
 endmacro(GR_PYBIND_MAKE_CHECK_HASH)
@@ -165,7 +168,7 @@ macro(GR_PYBIND_MAKE_OOT name updir filter files)
 list(APPEND regen_targets "")
 foreach(file ${files})
 
-    execute_process(COMMAND "python3" 
+    execute_process(COMMAND "${PYTHON_EXECUTABLE}"
     ${CMAKE_CURRENT_SOURCE_DIR}/header_utils.py
     "all"
     ${CMAKE_CURRENT_SOURCE_DIR}/${file}
@@ -201,7 +204,7 @@ foreach(file ${files})
                 # Automatically regenerate the bindings               
                 add_custom_command( 
                     OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}}/${file}
-                    COMMAND  "python3" 
+                    COMMAND  "${PYTHON_EXECUTABLE}"
                     ${CMAKE_CURRENT_SOURCE_DIR}/bind_oot_file.py
                     "--output_dir" ${CMAKE_CURRENT_SOURCE_DIR}/..
                     "--prefix" ${CMAKE_INSTALL_PREFIX}
@@ -235,7 +238,7 @@ if(ENABLE_DOXYGEN)
     
     add_custom_command( 
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/extracted_docstrings.json
-        COMMAND python3 ${CMAKE_SOURCE_DIR}/docs/doxygen/update_pydoc.py "scrape"
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/docs/doxygen/update_pydoc.py "scrape"
         "--xml_path" ${CMAKE_BINARY_DIR}/docs/doxygen/xml
         "--json_path" ${CMAKE_CURRENT_BINARY_DIR}/extracted_docstrings.json
         COMMENT "Scraping generated documentation for docstrings ..."
@@ -248,7 +251,7 @@ if(ENABLE_DOXYGEN)
 
     add_custom_command( 
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/docstring_status
-        COMMAND python3 ${CMAKE_SOURCE_DIR}/docs/doxygen/update_pydoc.py "sub"
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/docs/doxygen/update_pydoc.py "sub"
         "--json_path" ${CMAKE_CURRENT_BINARY_DIR}/extracted_docstrings.json
         "--bindings_dir" ${CMAKE_CURRENT_SOURCE_DIR}/docstrings
         "--output_dir" ${CMAKE_CURRENT_BINARY_DIR}
@@ -259,7 +262,7 @@ if(ENABLE_DOXYGEN)
 else(ENABLE_DOXYGEN)
     add_custom_command( 
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/docstring_status
-        COMMAND python3 ${CMAKE_SOURCE_DIR}/docs/doxygen/update_pydoc.py "copy"
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/docs/doxygen/update_pydoc.py "copy"
         "--bindings_dir" ${CMAKE_CURRENT_SOURCE_DIR}/docstrings
         "--output_dir" ${CMAKE_CURRENT_BINARY_DIR}
         COMMENT "Copying ${name} docstring templates as pybind headers ...")

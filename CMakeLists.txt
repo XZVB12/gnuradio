@@ -45,7 +45,7 @@ SET(VERSION_PATCH 0-git)
 include(GrVersion) #setup version info
 
 # Minimum dependency versions for central dependencies:
-set(GR_BOOST_MIN_VERSION "1.53")
+set(GR_BOOST_MIN_VERSION "1.58")
 set(GR_CMAKE_MIN_VERSION "3.5.1")
 set(GR_MAKO_MIN_VERSION "0.4.2")
 set(GR_PYTHON_MIN_VERSION "3.6.5")
@@ -340,7 +340,7 @@ ENDIF()
 
 execute_process(
     COMMAND "${PYTHON_EXECUTABLE}" -c
-    "from __future__ import print_function\ntry:\n import numpy\n import os\n inc_path = numpy.get_include()\n if os.path.exists(os.path.join(inc_path, 'numpy', 'arrayobject.h')):\n  print(inc_path, end='')\nexcept:\n pass"
+    "try:\n import numpy\n import os\n inc_path = numpy.get_include()\n if os.path.exists(os.path.join(inc_path, 'numpy', 'arrayobject.h')):\n  print(inc_path, end='')\nexcept:\n pass"
     OUTPUT_VARIABLE PYTHON_NUMPY_INCLUDE_DIR)
 
 include(GrComponent)
@@ -356,6 +356,10 @@ if(${CMAKE_BUILD_TYPE} STREQUAL "Coverage")
   setup_target_for_coverage(coverage "ctest || exit 0" coverage)
 endif()
 
+########################################################################
+# Enable/disable examples
+########################################################################
+OPTION(ENABLE_EXAMPLES "Enable examples" ON)
 
 ########################################################################
 # Detect and configure VOLK
@@ -410,6 +414,12 @@ install(
     DESTINATION ${GR_PKG_DOC_DIR}
 )
 
+install(
+    FILES .clang-format
+    RENAME clang-format.conf
+    DESTINATION ${GR_PKG_DATA_DIR}
+)
+
 ########################################################################
 # The following dependency libraries are needed by all gr modules:
 ########################################################################
@@ -428,6 +438,7 @@ list(APPEND GR_TEST_PYTHON_DIRS
 
 # gnuradio-runtime/include/gnuradio/block.h needs a define to tell it which
 # multiprecision arithmetic library header to include
+include(FindPkgConfig)
 find_package(MPLIB)
 add_definitions(${MPLIB_DEFINITIONS})
 

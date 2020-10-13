@@ -85,6 +85,7 @@ PYBIND11_MODULE(qtgui_python, m)
     py::module::import("gnuradio.gr");
 
     bind_QWidget(m);
+    bind_qtgui_types(m);
     // bind_ConstellationDisplayPlot(m);
     // bind_DisplayPlot(m);
     // bind_FrequencyDisplayPlot(m);
@@ -98,7 +99,7 @@ PYBIND11_MODULE(qtgui_python, m)
     bind_const_sink_c(m);
     // bind_constellationdisplayform(m);
     // bind_displayform(m);
-    // bind_edit_box_msg(m);
+    bind_edit_box_msg(m);
     bind_eye_sink_c(m);
     bind_eye_sink_f(m);
     // bind_form_menus(m);
@@ -108,11 +109,10 @@ PYBIND11_MODULE(qtgui_python, m)
     // bind_freqdisplayform(m);
     bind_histogram_sink_f(m);
     // bind_histogramdisplayform(m);
-    // bind_number_sink(m);
+    bind_number_sink(m);
     // bind_numberdisplayform(m);
     // // bind_plot_raster(m);
     // // bind_plot_waterfall(m);
-    // bind_qtgui_types(m);
     bind_sink_c(m);
     bind_sink_f(m);
     // // bind_spectrumUpdateEvents(m);

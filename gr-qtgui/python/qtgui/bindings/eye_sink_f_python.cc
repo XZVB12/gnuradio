@@ -50,7 +50,7 @@ void bind_eye_sink_f(py::module& m)
              py::arg("samp_rate"),
              py::arg("name"),
              py::arg("nconnections") = 1,
-             py::arg("parent") = __null,
+             py::arg("parent") = nullptr,
              D(eye_sink_f, make))
 
 
@@ -143,6 +143,11 @@ void bind_eye_sink_f(py::module& m)
              &eye_sink_f::set_samp_rate,
              py::arg("samp_rate"),
              D(eye_sink_f, set_samp_rate))
+
+        .def("set_samp_per_symbol",
+             &eye_sink_f::set_samp_per_symbol,
+             py::arg("samp_per_symbol"),
+             D(eye_sink_f, set_samp_per_symbol))
 
 
         .def("set_line_alpha",

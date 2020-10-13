@@ -10,9 +10,7 @@
 This is the GNU Radio NETWORK module. Place your Python package
 description here (python/__init__.py).
 '''
-from __future__ import unicode_literals
 
-# import swig generated symbols into the network namespace
 import os
 
 try:

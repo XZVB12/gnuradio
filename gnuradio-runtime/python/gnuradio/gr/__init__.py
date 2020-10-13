@@ -12,8 +12,6 @@
 """
 Core contents.
 """
-from __future__ import absolute_import
-from __future__ import unicode_literals
 
 # This is the main GNU Radio python module.
 # We pull the pybind output and the other modules into the gnuradio.gr namespace
@@ -54,3 +52,7 @@ if(log_debug_file == "stderr" or log_file == "stdout"):
     log_debug.add_console_appender(log_debug_file, "gr::log %d :%p: %m%n")
 else:
     log_debug.add_file_appender(log_debug_file, True, "%r :%p: %c{1} - %m%n")
+
+io_signaturev = io_signature.makev
+io_signature3 = io_signature.make3
+io_signature2 = io_signature.make2

@@ -1,3 +1,10 @@
+# Copyright 2020 Free Software Foundation, Inc.
+#
+# This file is part of GNU Radio
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
 include(GrPybind)
 
 ########################################################################
@@ -73,7 +80,6 @@ list(APPEND blocks_python_files
     lfsr_15_1_0_python.cc
     lfsr_32k_python.cc
     lfsr_32k_source_s_python.cc
-    # log2_const_python.cc
     magphase_to_complex_python.cc
     max_blk_python.cc
     message_debug_python.cc
@@ -124,6 +130,7 @@ list(APPEND blocks_python_files
     short_to_float_python.cc
     skiphead_python.cc
     socket_pdu_python.cc
+    stream_demux_python.cc
     stream_mux_python.cc
     stream_to_streams_python.cc
     stream_to_tagged_stream_python.cc
@@ -162,14 +169,18 @@ list(APPEND blocks_python_files
     vector_source_python.cc
     vector_to_stream_python.cc
     vector_to_streams_python.cc
-    wavfile_python.cc
-    wavfile_sink_python.cc
-    wavfile_source_python.cc
     xor_blk_python.cc
     python_bindings.cc)
 
-GR_PYBIND_MAKE_CHECK_HASH(blocks 
-  ../../.. 
+if (SNDFILE_FOUND)
+    list(APPEND blocks_python_files
+        wavfile_python.cc
+        wavfile_sink_python.cc
+        wavfile_source_python.cc)
+endif()
+
+GR_PYBIND_MAKE_CHECK_HASH(blocks
+  ../../..
   gr::blocks
   "${blocks_python_files}")
 

@@ -52,7 +52,7 @@ void bind_freq_sink_c(py::module& m)
              py::arg("bw"),
              py::arg("name"),
              py::arg("nconnections") = 1,
-             py::arg("parent") = __null,
+             py::arg("parent") = nullptr,
              D(freq_sink_c, make))
 
 
@@ -100,6 +100,11 @@ void bind_freq_sink_c(py::module& m)
 
 
         .def("fft_window", &freq_sink_c::fft_window, D(freq_sink_c, fft_window))
+
+
+        .def("set_fft_window_normalized",
+             &freq_sink_c::set_fft_window_normalized,
+             D(freq_sink_c, set_fft_window_normalized))
 
 
         .def("set_frequency_range",

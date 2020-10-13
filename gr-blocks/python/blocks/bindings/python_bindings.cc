@@ -84,7 +84,6 @@ void bind_keep_one_in_n(py::module&);
 void bind_lfsr_15_1_0(py::module&);
 void bind_lfsr_32k(py::module&);
 void bind_lfsr_32k_source_s(py::module&);
-// void bind_log2_const(py::module&);
 void bind_magphase_to_complex(py::module&);
 void bind_max_blk(py::module&);
 void bind_message_debug(py::module&);
@@ -135,6 +134,7 @@ void bind_short_to_char(py::module&);
 void bind_short_to_float(py::module&);
 void bind_skiphead(py::module&);
 void bind_socket_pdu(py::module&);
+void bind_stream_demux(py::module&);
 void bind_stream_mux(py::module&);
 void bind_stream_to_streams(py::module&);
 void bind_stream_to_tagged_stream(py::module&);
@@ -173,9 +173,11 @@ void bind_vector_sink(py::module&);
 void bind_vector_source(py::module&);
 void bind_vector_to_stream(py::module&);
 void bind_vector_to_streams(py::module&);
+#ifndef NO_WAVFILE
 void bind_wavfile(py::module&);
 void bind_wavfile_sink(py::module&);
 void bind_wavfile_source(py::module&);
+#endif
 void bind_xor_blk(py::module&);
 
 // We need this hack because import_array() returns NULL
@@ -266,7 +268,6 @@ PYBIND11_MODULE(blocks_python, m)
     bind_lfsr_15_1_0(m);
     bind_lfsr_32k(m);
     bind_lfsr_32k_source_s(m);
-    // bind_log2_const(m);
     bind_magphase_to_complex(m);
     bind_max_blk(m);
     bind_message_debug(m);
@@ -316,6 +317,7 @@ PYBIND11_MODULE(blocks_python, m)
     bind_short_to_float(m);
     bind_skiphead(m);
     bind_socket_pdu(m);
+    bind_stream_demux(m);
     bind_stream_mux(m);
     bind_stream_to_streams(m);
     bind_stream_to_tagged_stream(m);
@@ -354,8 +356,10 @@ PYBIND11_MODULE(blocks_python, m)
     bind_vector_source(m);
     bind_vector_to_stream(m);
     bind_vector_to_streams(m);
+#ifndef NO_WAVFILE
     bind_wavfile(m);
     bind_wavfile_sink(m);
     bind_wavfile_source(m);
+#endif
     bind_xor_blk(m);
 }

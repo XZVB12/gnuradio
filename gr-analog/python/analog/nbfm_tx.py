@@ -7,10 +7,6 @@
 #
 #
 
-from __future__ import print_function
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import unicode_literals
 
 import math
 
@@ -52,7 +48,7 @@ class nbfm_tx(gr.hier_block2):
         do_interp = audio_rate != quad_rate
 
         if do_interp:
-            interp_factor = quad_rate / audio_rate
+            interp_factor = int(quad_rate / audio_rate)           # force integer
             interp_taps = filter.optfir.low_pass(interp_factor,   # gain
                                                  quad_rate,       # Fs
                                                  4500,            # passband cutoff

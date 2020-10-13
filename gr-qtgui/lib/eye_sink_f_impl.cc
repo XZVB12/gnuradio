@@ -33,8 +33,8 @@ eye_sink_f::sptr eye_sink_f::make(int size,
                                   unsigned int nconnections,
                                   QWidget* parent)
 {
-    return gnuradio::get_initial_sptr(
-        new eye_sink_f_impl(size, samp_rate, name, nconnections, parent));
+    return gnuradio::make_block_sptr<eye_sink_f_impl>(
+        size, samp_rate, name, nconnections, parent);
 }
 
 eye_sink_f_impl::eye_sink_f_impl(int size,
@@ -67,7 +67,7 @@ eye_sink_f_impl::eye_sink_f_impl(int size,
 
     // setup PDU handling input port
     message_port_register_in(pmt::mp("in"));
-    set_msg_handler(pmt::mp("in"), boost::bind(&eye_sink_f_impl::handle_pdus, this, _1));
+    set_msg_handler(pmt::mp("in"), [this](pmt::pmt_t msg) { this->handle_pdus(msg); });
 
     // +1 for the PDU buffer
     for (unsigned int n = 0; n < d_nconnections + 1; n++) {
@@ -182,7 +182,7 @@ void eye_sink_f_impl::set_samp_per_symbol(unsigned int sps)
 
 void eye_sink_f_impl::set_title(const std::string& title)
 {
-    // set_title no longer used but called by swig
+    // set_title no longer used.
 }
 
 void eye_sink_f_impl::set_line_label(unsigned int which, const std::string& label)

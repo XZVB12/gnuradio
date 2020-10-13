@@ -151,6 +151,31 @@ void bind_usrp_block(py::module& m)
              D(usrp_block, get_gain_range, 1))
 
 
+        .def("has_power_reference",
+             &usrp_block::has_power_reference,
+             py::arg("chan") = 0,
+             D(usrp_block, has_power_reference))
+
+
+        .def("set_power_reference",
+             &usrp_block::set_power_reference,
+             py::arg("power_dbm"),
+             py::arg("chan") = 0,
+             D(usrp_block, set_power_reference))
+
+
+        .def("get_power_reference",
+             &usrp_block::get_power_reference,
+             py::arg("chan") = 0,
+             D(usrp_block, get_power_reference))
+
+
+        .def("get_power_range",
+             &usrp_block::get_power_range,
+             py::arg("chan") = 0,
+             D(usrp_block, get_power_range))
+
+
         .def("set_antenna",
              &usrp_block::set_antenna,
              py::arg("ant"),
@@ -388,7 +413,18 @@ void bind_usrp_block(py::module& m)
              py::arg("path"),
              D(usrp_block, get_filter))
 
-        ;
+        .def(
+            "get_usrp_info",
+            [](usrp_block& self, const size_t chan = 0) {
+                std::map<std::string, std::string> new_map;
+                auto usrp_info = self.get_usrp_info(chan);
+                for (const auto& k : self.get_usrp_info(chan).keys()) {
+                    new_map[k] = usrp_info[k];
+                }
+                return new_map;
+            },
+            py::arg("chan") = 0,
+            D(usrp_block, get_usrp_info));
 
 
     m.def("cmd_chan_key", &::gr::uhd::cmd_chan_key, D(cmd_chan_key));

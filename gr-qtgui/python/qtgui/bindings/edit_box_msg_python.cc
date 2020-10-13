@@ -49,11 +49,23 @@ void bind_edit_box_msg(py::module& m)
              py::arg("is_pair") = true,
              py::arg("is_static") = true,
              py::arg("key") = "",
-             py::arg("parent") = __null,
+             py::arg("parent") = nullptr,
              D(edit_box_msg, make))
 
 
         .def("exec_", &edit_box_msg::exec_, D(edit_box_msg, exec_))
+
+        // .def("pyqwidget",&edit_box_msg::pyqwidget,
+        //     D(edit_box_msg,pyqwidget)
+        // )
+        // For the sip conversion to python to work, the widget object
+        // needs to be explicitly converted to long long.
+        .def(
+            "pyqwidget",
+            [](std::shared_ptr<edit_box_msg> p) {
+                return PyLong_AsLongLong(p->pyqwidget());
+            },
+            D(edit_box_msg, pyqwidget))
 
 
         .def("qwidget", &edit_box_msg::qwidget, D(edit_box_msg, qwidget))
