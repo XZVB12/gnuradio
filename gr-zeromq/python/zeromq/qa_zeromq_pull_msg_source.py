@@ -15,6 +15,7 @@ import zmq
 from gnuradio import gr, gr_unittest, blocks, zeromq
 import pmt
 
+
 class qa_zeromq_pull_msg_source(gr_unittest.TestCase):
     """Unit tests for ZMQ PULL Message Source block"""
 
@@ -24,10 +25,12 @@ class qa_zeromq_pull_msg_source(gr_unittest.TestCase):
         self.zmq_sock = self.context.socket(zmq.PUSH)
         port = self.zmq_sock.bind_to_random_port(addr)
 
-        self.zeromq_pull_msg_source = zeromq.pull_msg_source(('%s:%s' % (addr, port)), 100)
+        self.zeromq_pull_msg_source = zeromq.pull_msg_source(
+            ('%s:%s' % (addr, port)), 100)
         self.message_debug = blocks.message_debug()
         self.tb = gr.top_block()
-        self.tb.msg_connect((self.zeromq_pull_msg_source, 'out'), (self.message_debug, 'store'))
+        self.tb.msg_connect(
+            (self.zeromq_pull_msg_source, 'out'), (self.message_debug, 'store'))
 
         self.tb.start()
         time.sleep(0.1)
@@ -45,17 +48,19 @@ class qa_zeromq_pull_msg_source(gr_unittest.TestCase):
         """Test receiving of valid PMT messages"""
         msg = pmt.to_pmt('test_valid_pmt')
         self.zmq_sock.send(pmt.serialize_str(msg))
-
-        time.sleep(0.1)
+        for _ in range(10):
+            if self.message_debug.num_messages() > 0:
+                break
+            time.sleep(0.2)
         self.assertEqual(1, self.message_debug.num_messages())
         self.assertTrue(pmt.equal(msg, self.message_debug.get_message(0)))
 
     def test_invalid_pmt(self):
         """Test receiving of invalid PMT messages"""
         self.zmq_sock.send_string('test_invalid_pmt')
-
         time.sleep(0.1)
         self.assertEqual(0, self.message_debug.num_messages())
+
 
 if __name__ == '__main__':
     gr_unittest.run(qa_zeromq_pull_msg_source)

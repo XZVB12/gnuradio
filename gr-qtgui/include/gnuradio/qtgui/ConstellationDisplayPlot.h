@@ -12,7 +12,7 @@
 #define CONSTELLATION_DISPLAY_PLOT_H
 
 #include <gnuradio/qtgui/DisplayPlot.h>
-#include <stdint.h>
+#include <cstdint>
 #include <cstdio>
 #include <vector>
 
@@ -26,7 +26,7 @@ class ConstellationDisplayPlot : public DisplayPlot
 
 public:
     ConstellationDisplayPlot(int nplots, QWidget*);
-    virtual ~ConstellationDisplayPlot();
+    ~ConstellationDisplayPlot() override;
 
     void plotNewData(const std::vector<double*> realDataPoints,
                      const std::vector<double*> imagDataPoints,
@@ -39,7 +39,7 @@ public:
                      const int64_t numDataPoints,
                      const double timeInterval);
 
-    void replot();
+    void replot() override;
 
     void set_xaxis(double min, double max);
     void set_yaxis(double min, double max);
@@ -52,8 +52,8 @@ public slots:
 private:
     void _autoScale(double bottom, double top);
 
-    std::vector<double*> d_real_data;
-    std::vector<double*> d_imag_data;
+    std::vector<std::vector<double>> d_real_data;
+    std::vector<std::vector<double>> d_imag_data;
 
     int64_t d_pen_size;
 };

@@ -23,8 +23,8 @@ namespace gr {
 class GR_RUNTIME_API vmcircbuf_mmap_tmpfile : public gr::vmcircbuf
 {
 public:
-    vmcircbuf_mmap_tmpfile(int size);
-    virtual ~vmcircbuf_mmap_tmpfile();
+    vmcircbuf_mmap_tmpfile(size_t size);
+    ~vmcircbuf_mmap_tmpfile() override;
 };
 
 /*!
@@ -38,19 +38,19 @@ private:
 public:
     static gr::vmcircbuf_factory* singleton();
 
-    virtual const char* name() const { return "gr::vmcircbuf_mmap_tmpfile_factory"; }
+    const char* name() const override { return "gr::vmcircbuf_mmap_tmpfile_factory"; }
 
     /*!
      * \brief return granularity of mapping, typically equal to page size
      */
-    virtual int granularity();
+    int granularity() override;
 
     /*!
      * \brief return a gr::vmcircbuf, or 0 if unable.
      *
      * Call this to create a doubly mapped circular buffer.
      */
-    virtual gr::vmcircbuf* make(int size);
+    gr::vmcircbuf* make(size_t size) override;
 };
 
 } /* namespace gr */

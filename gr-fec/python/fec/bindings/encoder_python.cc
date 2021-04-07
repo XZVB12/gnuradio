@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(encoder.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(6c945b377b873e84738f7ccd83fee16c)                     */
+/* BINDTOOL_HEADER_FILE_HASH(d120efc9684a7563dd04193326c94954)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -62,13 +62,6 @@ void bind_encoder(py::module& m)
              &encoder::fixed_rate_noutput_to_ninput,
              py::arg("noutput"),
              D(encoder, fixed_rate_noutput_to_ninput))
-
-
-        .def("forecast",
-             &encoder::forecast,
-             py::arg("noutput_items"),
-             py::arg("ninput_items_required"),
-             D(encoder, forecast))
 
         ;
 }

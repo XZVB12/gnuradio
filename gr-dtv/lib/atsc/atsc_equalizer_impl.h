@@ -44,21 +44,21 @@ private:
     unsigned short d_flags;
     short d_segno;
 
-    bool d_buff_not_filled;
+    bool d_buff_not_filled = true;
 
 public:
     atsc_equalizer_impl();
-    ~atsc_equalizer_impl();
+    ~atsc_equalizer_impl() override;
 
-    void setup_rpc();
+    void setup_rpc() override;
 
-    std::vector<float> taps() const;
-    std::vector<float> data() const;
+    std::vector<float> taps() const override;
+    std::vector<float> data() const override;
 
-    virtual int general_work(int noutput_items,
-                             gr_vector_int& ninput_items,
-                             gr_vector_const_void_star& input_items,
-                             gr_vector_void_star& output_items);
+    int general_work(int noutput_items,
+                     gr_vector_int& ninput_items,
+                     gr_vector_const_void_star& input_items,
+                     gr_vector_void_star& output_items) override;
 };
 
 } /* namespace dtv */

@@ -93,8 +93,6 @@ private:
     const int d_nsymbols;
     // Number of bits after depuncturing a block (before decoding)
     const int d_nbits;
-    // Number of full packed out bytes
-    const int d_nout;
 
     // Traceback (in bytes)
     int d_ntraceback;
@@ -137,14 +135,14 @@ public:
                               dvbt_hierarchy_t hierarchy,
                               dvb_code_rate_t coderate,
                               int bsize);
-    ~dvbt_viterbi_decoder_impl();
+    ~dvbt_viterbi_decoder_impl() override;
 
-    void forecast(int noutput_items, gr_vector_int& ninput_items_required);
+    void forecast(int noutput_items, gr_vector_int& ninput_items_required) override;
 
     int general_work(int noutput_items,
                      gr_vector_int& ninput_items,
                      gr_vector_const_void_star& input_items,
-                     gr_vector_void_star& output_items);
+                     gr_vector_void_star& output_items) override;
 };
 
 } // namespace dtv

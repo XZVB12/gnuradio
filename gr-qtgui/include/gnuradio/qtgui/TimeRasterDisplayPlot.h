@@ -16,7 +16,7 @@
 #include <gnuradio/qtgui/plot_raster.h>
 #include <gnuradio/qtgui/timeRasterGlobalData.h>
 #include <qwt_plot_rasteritem.h>
-#include <stdint.h>
+#include <cstdint>
 #include <cstdio>
 #include <vector>
 
@@ -42,7 +42,7 @@ class TimeRasterDisplayPlot : public DisplayPlot
 public:
     TimeRasterDisplayPlot(
         int nplots, double samp_rate, double rows, double cols, QWidget*);
-    virtual ~TimeRasterDisplayPlot();
+    ~TimeRasterDisplayPlot() override;
 
     void reset();
 
@@ -50,6 +50,10 @@ public:
     void setNumCols(double cols);
     void setAlpha(unsigned int which, int alpha);
     void setSampleRate(double samprate);
+    void setXLabel(const std::string& label);
+    void setXAxis(double start, double end);
+    void setYLabel(const std::string& label);
+    void setYAxis(double start, double end);
 
     double numRows() const;
     double numCols() const;
@@ -67,7 +71,7 @@ public:
 
     void setIntensityRange(const double minIntensity, const double maxIntensity);
 
-    void replot(void);
+    void replot(void) override;
 
     int getIntensityColorMapType(unsigned int) const;
     int getIntensityColorMapType1() const;
@@ -100,6 +104,13 @@ private:
     QColor d_high_intensity;
 
     int d_color_bar_title_font_size;
+
+    std::string d_x_label;
+    double d_x_start_value;
+    double d_x_end_value;
+    std::string d_y_label;
+    double d_y_start_value;
+    double d_y_end_value;
 };
 
 #endif /* TIMERASTER_DISPLAY_PLOT_H */

@@ -26,7 +26,7 @@ std::vector<kernel::fir_filter_fff> build_filters()
     filters.reserve(DNSTEPS + 1);
     for (int i = 0; i < DNSTEPS + 1; i++) {
         std::vector<float> t(&Dtaps[i][0], &Dtaps[i][DNTAPS]);
-        filters.emplace_back(1, t);
+        filters.emplace_back(t);
     }
     return filters;
 }
@@ -35,8 +35,6 @@ std::vector<kernel::fir_filter_fff> build_filters()
 mmse_interp_differentiator_ff::mmse_interp_differentiator_ff() : filters(build_filters())
 {
 }
-
-mmse_interp_differentiator_ff::~mmse_interp_differentiator_ff() {}
 
 unsigned mmse_interp_differentiator_ff::ntaps() const { return DNTAPS; }
 

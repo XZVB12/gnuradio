@@ -60,7 +60,7 @@ private:
     int d_ntaps;
     int d_nsamples;
     int d_fftsize; // fftsize = ntaps + nsamples - 1
-    const int d_decimation;
+    int d_decimation;
     std::unique_ptr<fft::fft_real_fwd> d_fwdfft; // forward "plan"
     std::unique_ptr<fft::fft_real_rev> d_invfft; // inverse "plan"
     int d_nthreads;                              // number of FFTW threads to use
@@ -86,6 +86,15 @@ public:
      * \param nthreads   The number of threads for the FFT to use (int)
      */
     fft_filter_fff(int decimation, const std::vector<float>& taps, int nthreads = 1);
+
+    // Disallow copy.
+    //
+    // This prevents accidentally doing needless copies, not just of fft_filter_xxx,
+    // but every block that contains one.
+    fft_filter_fff(const fft_filter_fff&) = delete;
+    fft_filter_fff& operator=(const fft_filter_fff&) = delete;
+    fft_filter_fff(fft_filter_fff&&) = default;
+    fft_filter_fff& operator=(fft_filter_fff&&) = default;
 
     /*!
      * \brief Set new taps for the filter.
@@ -164,10 +173,10 @@ private:
     int d_ntaps;
     int d_nsamples;
     int d_fftsize; // fftsize = ntaps + nsamples - 1
-    const int d_decimation;
-    std::unique_ptr<fft::fft_complex> d_fwdfft; // forward "plan"
-    std::unique_ptr<fft::fft_complex> d_invfft; // inverse "plan"
-    int d_nthreads;                             // number of FFTW threads to use
+    int d_decimation;
+    std::unique_ptr<fft::fft_complex_fwd> d_fwdfft; // forward "plan"
+    std::unique_ptr<fft::fft_complex_rev> d_invfft; // inverse "plan"
+    int d_nthreads;                                 // number of FFTW threads to use
     std::vector<gr_complex> d_tail; // state carried between blocks for overlap-add
     std::vector<gr_complex> d_taps; // stores time domain taps
     volk::vector<gr_complex> d_xformed_taps; // Fourier xformed taps
@@ -190,6 +199,15 @@ public:
      * \param nthreads   The number of threads for the FFT to use (int)
      */
     fft_filter_ccc(int decimation, const std::vector<gr_complex>& taps, int nthreads = 1);
+
+    // Disallow copy.
+    //
+    // This prevents accidentally doing needless copies, not just of fft_filter_xxx,
+    // but every block that contains one.
+    fft_filter_ccc(const fft_filter_ccc&) = delete;
+    fft_filter_ccc& operator=(const fft_filter_ccc&) = delete;
+    fft_filter_ccc(fft_filter_ccc&&) = default;
+    fft_filter_ccc& operator=(fft_filter_ccc&&) = default;
 
     /*!
      * \brief Set new taps for the filter.
@@ -268,10 +286,10 @@ private:
     int d_ntaps;
     int d_nsamples;
     int d_fftsize; // fftsize = ntaps + nsamples - 1
-    const int d_decimation;
-    std::unique_ptr<fft::fft_complex> d_fwdfft; // forward "plan"
-    std::unique_ptr<fft::fft_complex> d_invfft; // inverse "plan"
-    int d_nthreads;                             // number of FFTW threads to use
+    int d_decimation;
+    std::unique_ptr<fft::fft_complex_fwd> d_fwdfft; // forward "plan"
+    std::unique_ptr<fft::fft_complex_rev> d_invfft; // inverse "plan"
+    int d_nthreads;                                 // number of FFTW threads to use
     std::vector<gr_complex> d_tail; // state carried between blocks for overlap-add
     std::vector<float> d_taps;      // stores time domain taps
     volk::vector<gr_complex> d_xformed_taps; // Fourier xformed taps
@@ -294,6 +312,15 @@ public:
      * \param nthreads   The number of threads for the FFT to use (int)
      */
     fft_filter_ccf(int decimation, const std::vector<float>& taps, int nthreads = 1);
+
+    // Disallow copy.
+    //
+    // This prevents accidentally doing needless copies, not just of fft_filter_xxx,
+    // but every block that contains one.
+    fft_filter_ccf(const fft_filter_ccf&) = delete;
+    fft_filter_ccf& operator=(const fft_filter_ccf&) = delete;
+    fft_filter_ccf(fft_filter_ccf&&) = default;
+    fft_filter_ccf& operator=(fft_filter_ccf&&) = default;
 
     /*!
      * \brief Set new taps for the filter.

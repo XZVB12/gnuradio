@@ -9,20 +9,26 @@ include(GrMiscUtils)
 gr_check_hdr_n_def(sys/resource.h HAVE_SYS_RESOURCE_H)
 
 ########################################################################
+# Look for libunwind
+########################################################################
+find_package(libunwind)
+if(libunwind_FOUND)
+    add_definitions(-DHAVE_LIBUNWIND)
+endif(libunwind_FOUND)
+
+########################################################################
 # Handle the generated constants
 ########################################################################
-execute_process(COMMAND ${PYTHON_EXECUTABLE} -c
-    "import time;print(time.strftime('%a, %d %b %Y %H:%M:%S', time.gmtime()))"
-    OUTPUT_VARIABLE BUILD_DATE OUTPUT_STRIP_TRAILING_WHITESPACE
-)
 message(STATUS "Loading build date ${BUILD_DATE} into constants...")
 message(STATUS "Loading version ${VERSION} into constants...")
 
-#double escape for windows backslash path separators
-string(REPLACE "\\" "\\\\" prefix "${prefix}")
-string(REPLACE "\\" "\\\\" SYSCONFDIR "${SYSCONFDIR}")
-string(REPLACE "\\" "\\\\" GR_PREFSDIR "${GR_PREFSDIR}")
 
+#Generate the constants file, now that we actually know which components will be enabled.
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/constants.cc.in
+  ${CMAKE_CURRENT_BINARY_DIR}/constants.cc
+  ESCAPE_QUOTES
+  @ONLY)
 
 #########################################################################
 # Include subdirs rather to populate to the sources lists.
@@ -32,11 +38,16 @@ add_subdirectory(pmt)
 ########################################################################
 # Setup library
 ########################################################################
-configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/constants.cc.in
-    ${CMAKE_CURRENT_BINARY_DIR}/constants.cc
-    ESCAPE_QUOTES
-    @ONLY)
+
+#Generate sine table header file for Math part of library
+set(MATH_SINE_TABLE_HEADER ${CMAKE_CURRENT_BINARY_DIR}/math/generated/sine_table.h)
+set(MATH_SINE_TABLE_GENERATOR ${CMAKE_CURRENT_SOURCE_DIR}/math/gen_sine_table.py)
+execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_CURRENT_BINARY_DIR}/math/generated")
+add_custom_command(
+  DEPENDS ${MATH_SINE_TABLE_GENERATOR}
+  OUTPUT ${MATH_SINE_TABLE_HEADER}
+  COMMAND ${PYTHON_EXECUTABLE} ${MATH_SINE_TABLE_GENERATOR} > ${MATH_SINE_TABLE_HEADER}
+)
 
 add_library(gnuradio-runtime
   ${CMAKE_CURRENT_BINARY_DIR}/constants.cc
@@ -61,6 +72,7 @@ add_library(gnuradio-runtime
   msg_handler.cc
   msg_queue.cc
   pagesize.cc
+  pdu.cc
   prefs.cc
   realtime.cc
   realtime_impl.cc
@@ -72,6 +84,7 @@ add_library(gnuradio-runtime
   sync_interpolator.cc
   sys_paths.cc
   tagged_stream_block.cc
+  terminate_handler.cc
   test.cc
   top_block.cc
   top_block_impl.cc
@@ -101,10 +114,12 @@ target_sources(gnuradio-runtime PRIVATE
   )
 
 # Math
+target_include_directories(gnuradio-runtime PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/math)
 target_sources(gnuradio-runtime PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/math/fast_atan2f.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/math/fxpt.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/math/random.cc
+  ${MATH_SINE_TABLE_HEADER}
   )
 
 # Controlport
@@ -124,7 +139,7 @@ OPTION(ENABLE_CTRLPORT_THRIFT "Enable ControlPort Thrift support" ON)
 
 if(ENABLE_CTRLPORT_THRIFT)
 # Look if Thrift is installed and use it as a ControlPort backend.
-FIND_PACKAGE(THRIFT)
+FIND_PACKAGE(THRIFT ${GR_THRIFT_MIN_VERSION})
 
 if(THRIFT_FOUND)
 list(APPEND EXTRA_DEPS "THRIFT")
@@ -189,19 +204,27 @@ target_link_libraries(gnuradio-runtime PUBLIC
   gnuradio-pmt
   Volk::volk
   Boost::program_options
-  Boost::filesystem
   Boost::system
   Boost::regex
   Boost::thread
   Log4Cpp::log4cpp
   MPLib::mplib
-  ${PYTHON_LIBRARIES}
+  ${libunwind_LIBRARIES}
+  # INTERFACE/PRIVATE split so users of the library can choose how to link to Python
+  # (importantly, extension modules can avoid linking against Python and resolve
+  #  their own Python symbols at runtime through the Python interpreter's linking)
+  INTERFACE
+    Python::Module
+  PRIVATE
+    Python::Python
   )
+
+# Address linker issues with std::filesystem on Centos 8 and Debian
+target_link_libraries(gnuradio-runtime PUBLIC $<$<AND:$<CXX_COMPILER_ID:GNU>,$<VERSION_LESS:$<CXX_COMPILER_VERSION>,9.0>>:stdc++fs>)
 
 target_include_directories(gnuradio-runtime
   PUBLIC
-    ${PYTHON_INCLUDE_DIR} 
-    ${PYTHON_NUMPY_INCLUDE_DIR} 
+    ${PYTHON_NUMPY_INCLUDE_DIR}
     ${pybind11_INCLUDE_DIR}
     $<INSTALL_INTERFACE:include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
@@ -209,6 +232,9 @@ target_include_directories(gnuradio-runtime
   PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     )
+
+# constants.cc includes boost::dll headers, force them to use std::filesystem
+target_compile_definitions(gnuradio-runtime PRIVATE BOOST_DLL_USE_STD_FS)
 
   if(ENABLE_GR_CTRLPORT)
     target_compile_definitions(gnuradio-runtime PUBLIC GR_CTRLPORT)

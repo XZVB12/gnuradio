@@ -13,8 +13,8 @@
 /* If manual edits are made, the following tags should be modified accordingly.    */
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
-/* BINDTOOL_HEADER_FILE(corr_est_cc.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(bc2913cc6c389d7d0eecd401f081f6f1)                     */
+/* BINDTOOL_HEADER_FILE(corr_est_cc.h)                                             */
+/* BINDTOOL_HEADER_FILE_HASH(9f1bed2a780e7f84a05da2a0eb5fe345)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -36,6 +36,8 @@ void bind_corr_est_cc(py::module& m)
         .value("THRESHOLD_DYNAMIC", gr::digital::THRESHOLD_DYNAMIC)   // 0
         .value("THRESHOLD_ABSOLUTE", gr::digital::THRESHOLD_ABSOLUTE) // 1
         .export_values();
+
+    py::implicitly_convertible<int, gr::digital::tm_type>();
 
     py::class_<corr_est_cc,
                gr::sync_block,

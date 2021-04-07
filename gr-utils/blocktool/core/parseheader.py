@@ -42,7 +42,7 @@ class BlockHeaderParser(BlockTool):
         : returns the parsed header data in python dict
         : return dict keys: namespace, class, io_signature, make,
                        properties, methods
-    : Can be used as an CLI command or an extenal API
+    : Can be used as an CLI command or an external API
     """
     name = 'Block Parse Header'
     description = 'Create a parsed output from a block header file'
@@ -56,7 +56,7 @@ class BlockHeaderParser(BlockTool):
         if (include_paths):
             self.include_paths = [p.strip() for p in include_paths.split(',')]
         if not os.path.isfile(file_path):
-            raise BlockToolException('file does not exist')
+            raise BlockToolException('file', file_path, 'does not exist')
         file_path = os.path.abspath(file_path)
         self.target_file = file_path
         self.initialize()
@@ -95,7 +95,7 @@ class BlockHeaderParser(BlockTool):
         : returns the parsed header data in python dict
         : return dict keys: namespace, class, io_signature, make,
                        properties, methods
-        : Can be used as an CLI command or an extenal API
+        : Can be used as an CLI command or an external API
         """
         gr = self.modname.split('-')[0]
         module = self.modname.split('-')[-1]

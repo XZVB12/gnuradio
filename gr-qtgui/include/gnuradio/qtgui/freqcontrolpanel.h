@@ -29,7 +29,7 @@ class FreqControlPanel : public QVBoxLayout
 
 public:
     FreqControlPanel(FreqDisplayForm* form);
-    ~FreqControlPanel();
+    ~FreqControlPanel() override;
 
 public slots:
     void notifyAvgSlider(int val);
@@ -45,6 +45,7 @@ public slots:
     void toggleTriggerMode(gr::qtgui::trigger_mode mode);
 
     void toggleStopButton();
+    void updateStopLabel(bool on);
 
 signals:
     void signalAvgSlider(float val);

@@ -52,8 +52,6 @@ private:
     typedef std::map<pmt::pmt_t, msg_queue_t, pmt::comparator> msg_queue_map_t;
     typedef std::map<pmt::pmt_t, msg_queue_t, pmt::comparator>::iterator
         msg_queue_map_itr;
-    std::map<pmt::pmt_t, std::shared_ptr<boost::condition_variable>, pmt::comparator>
-        msg_queue_ready;
 
     gr::thread::mutex mutex; //< protects all vars
 
@@ -131,7 +129,7 @@ protected:
 
 public:
     pmt::pmt_t message_subscribers(pmt::pmt_t port);
-    virtual ~basic_block();
+    ~basic_block() override;
     long unique_id() const { return d_unique_id; }
     long symbolic_id() const { return d_symbolic_id; }
 

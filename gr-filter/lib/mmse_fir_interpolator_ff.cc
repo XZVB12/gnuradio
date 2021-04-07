@@ -26,15 +26,13 @@ std::vector<kernel::fir_filter_fff> build_filters()
     filters.reserve(NSTEPS + 1);
     for (int i = 0; i < NSTEPS + 1; i++) {
         std::vector<float> t(&taps[i][0], &taps[i][NTAPS]);
-        filters.emplace_back(1, t);
+        filters.emplace_back(t);
     }
     return filters;
 }
 } // namespace
 
 mmse_fir_interpolator_ff::mmse_fir_interpolator_ff() : filters(build_filters()) {}
-
-mmse_fir_interpolator_ff::~mmse_fir_interpolator_ff() {}
 
 unsigned mmse_fir_interpolator_ff::ntaps() const { return NTAPS; }
 

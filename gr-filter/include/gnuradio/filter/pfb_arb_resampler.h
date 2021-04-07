@@ -71,7 +71,7 @@ namespace kernel {
  * interpolation rate (<EM>32</EM>).
  *
  *   <B><EM>self._taps = filter.firdes.low_pass_2(32, 32*fs, BW, TB,
- *      attenuation_dB=ATT, window=filter.firdes.WIN_BLACKMAN_hARRIS)</EM></B>
+ *      attenuation_dB=ATT, window=fft.window.WIN_BLACKMAN_hARRIS)</EM></B>
  *
  * The theory behind this block can be found in Chapter 7.5 of
  * the following book:
@@ -131,7 +131,9 @@ public:
                           const std::vector<float>& taps,
                           unsigned int filter_size);
 
-    ~pfb_arb_resampler_ccf();
+    // Don't allow copy.
+    pfb_arb_resampler_ccf(const pfb_arb_resampler_ccf&) = delete;
+    pfb_arb_resampler_ccf& operator=(const pfb_arb_resampler_ccf&) = delete;
 
     /*!
      * Resets the filterbank's filter taps with the new prototype filter
@@ -259,7 +261,9 @@ public:
                           const std::vector<gr_complex>& taps,
                           unsigned int filter_size);
 
-    ~pfb_arb_resampler_ccc();
+    // Don't allow copy.
+    pfb_arb_resampler_ccc(const pfb_arb_resampler_ccc&) = delete;
+    pfb_arb_resampler_ccc& operator=(const pfb_arb_resampler_ccc&) = delete;
 
     /*!
      * Resets the filterbank's filter taps with the new prototype filter
@@ -388,7 +392,7 @@ public:
  * interpolation rate (<EM>32</EM>).
  *
  *   <B><EM>self._taps = filter.firdes.low_pass_2(32, 32*fs, BW, TB,
- *      attenuation_dB=ATT, window=filter.firdes.WIN_BLACKMAN_hARRIS)</EM></B>
+ *      attenuation_dB=ATT, window=fft.window.WIN_BLACKMAN_hARRIS)</EM></B>
  *
  * The theory behind this block can be found in Chapter 7.5 of
  * the following book:
@@ -448,7 +452,10 @@ public:
                           const std::vector<float>& taps,
                           unsigned int filter_size);
 
-    ~pfb_arb_resampler_fff();
+    // Don't allow copy.
+    pfb_arb_resampler_fff(const pfb_arb_resampler_fff&) = delete;
+    pfb_arb_resampler_fff& operator=(const pfb_arb_resampler_fff&) = delete;
+
 
     /*!
      * Resets the filterbank's filter taps with the new prototype filter

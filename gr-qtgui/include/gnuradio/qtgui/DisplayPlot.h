@@ -24,7 +24,7 @@
 #include <qwt_scale_engine.h>
 #include <qwt_scale_widget.h>
 #include <qwt_symbol.h>
-#include <stdint.h>
+#include <cstdint>
 #include <cstdio>
 #include <vector>
 
@@ -114,9 +114,9 @@ class DisplayPlot : public QwtPlot
 
 public:
     DisplayPlot(int nplots, QWidget*);
-    virtual ~DisplayPlot();
+    ~DisplayPlot() override;
 
-    virtual void replot() = 0;
+    void replot() override = 0;
 
     const QColor getLineColor1() const;
     const QColor getLineColor2() const;

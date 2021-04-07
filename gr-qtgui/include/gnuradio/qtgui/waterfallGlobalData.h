@@ -11,8 +11,8 @@
 #ifndef WATERFALL_GLOBAL_DATA_HPP
 #define WATERFALL_GLOBAL_DATA_HPP
 
-#include <inttypes.h>
 #include <qwt_raster_data.h>
+#include <cinttypes>
 
 #if QWT_VERSION >= 0x060000
 #include <qwt_compat.h>
@@ -23,7 +23,7 @@ class WaterfallData : public QwtRasterData
 {
 public:
     WaterfallData(const double, const double, const uint64_t, const unsigned int);
-    virtual ~WaterfallData();
+    ~WaterfallData() override;
 
     virtual void reset();
     virtual void copy(const WaterfallData*);
@@ -38,12 +38,12 @@ public:
     virtual void setRange(const QwtDoubleInterval&);
 #endif
 
-    virtual double value(double x, double y) const;
+    double value(double x, double y) const override;
 
     virtual uint64_t getNumFFTPoints() const;
     virtual void addFFTData(const double*, const uint64_t, const int);
 
-    virtual double* getSpectrumDataBuffer() const;
+    virtual const double* getSpectrumDataBuffer() const;
     virtual void setSpectrumDataBuffer(const double*);
 
     virtual int getNumLinesToUpdate() const;
@@ -51,7 +51,7 @@ public:
     virtual void incrementNumLinesToUpdate();
 
 protected:
-    double* _spectrumData;
+    std::vector<double> _spectrumData;
     uint64_t _fftPoints;
     uint64_t _historyLength;
     int _numLinesToUpdate;

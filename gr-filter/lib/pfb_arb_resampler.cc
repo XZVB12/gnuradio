@@ -48,8 +48,8 @@ pfb_arb_resampler_ccf::pfb_arb_resampler_ccf(float rate,
     d_filters.reserve(d_int_rate);
     d_diff_filters.reserve(d_int_rate);
     for (unsigned int i = 0; i < d_int_rate; i++) {
-        d_filters.emplace_back(1, vtaps);
-        d_diff_filters.emplace_back(1, vtaps);
+        d_filters.emplace_back(vtaps);
+        d_diff_filters.emplace_back(vtaps);
     }
 
     // Now, actually set the filters' taps
@@ -74,8 +74,6 @@ pfb_arb_resampler_ccf::pfb_arb_resampler_ccf(float rate,
 
     d_est_phase_change = d_last_filter - (end_filter + accum_frac);
 }
-
-pfb_arb_resampler_ccf::~pfb_arb_resampler_ccf() {}
 
 void pfb_arb_resampler_ccf::create_taps(const std::vector<float>& newtaps,
                                         std::vector<std::vector<float>>& ourtaps,
@@ -240,8 +238,8 @@ pfb_arb_resampler_ccc::pfb_arb_resampler_ccc(float rate,
     // Create an FIR filter for each channel and zero out the taps
     std::vector<gr_complex> vtaps(0, d_int_rate);
     for (unsigned int i = 0; i < d_int_rate; i++) {
-        d_filters.emplace_back(1, vtaps);
-        d_diff_filters.emplace_back(1, vtaps);
+        d_filters.emplace_back(vtaps);
+        d_diff_filters.emplace_back(vtaps);
     }
 
     // Now, actually set the filters' taps
@@ -266,8 +264,6 @@ pfb_arb_resampler_ccc::pfb_arb_resampler_ccc(float rate,
 
     d_est_phase_change = d_last_filter - (end_filter + accum_frac);
 }
-
-pfb_arb_resampler_ccc::~pfb_arb_resampler_ccc() {}
 
 void pfb_arb_resampler_ccc::create_taps(const std::vector<gr_complex>& newtaps,
                                         std::vector<std::vector<gr_complex>>& ourtaps,
@@ -435,8 +431,8 @@ pfb_arb_resampler_fff::pfb_arb_resampler_fff(float rate,
     // Create an FIR filter for each channel and zero out the taps
     std::vector<float> vtaps(0, d_int_rate);
     for (unsigned int i = 0; i < d_int_rate; i++) {
-        d_filters.emplace_back(1, vtaps);
-        d_diff_filters.emplace_back(1, vtaps);
+        d_filters.emplace_back(vtaps);
+        d_diff_filters.emplace_back(vtaps);
     }
 
     // Now, actually set the filters' taps
@@ -461,8 +457,6 @@ pfb_arb_resampler_fff::pfb_arb_resampler_fff(float rate,
 
     d_est_phase_change = d_last_filter - (end_filter + accum_frac);
 }
-
-pfb_arb_resampler_fff::~pfb_arb_resampler_fff() {}
 
 void pfb_arb_resampler_fff::create_taps(const std::vector<float>& newtaps,
                                         std::vector<std::vector<float>>& ourtaps,

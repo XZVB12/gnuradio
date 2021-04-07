@@ -15,6 +15,8 @@
 #include <gnuradio/high_res_timer.h>
 #include <gnuradio/qtgui/eyedisplayform.h>
 
+#include <volk/volk_alloc.hh>
+
 namespace gr {
 namespace qtgui {
 
@@ -30,14 +32,19 @@ private:
     const pmt::pmt_t d_tag_key;
 
     int d_index, d_start, d_end;
-    std::vector<gr_complex*> d_cbuffers;
-    std::vector<double*> d_buffers;
+    std::vector<volk::vector<gr_complex>> d_cbuffers;
+    std::vector<volk::vector<double>> d_buffers;
     std::vector<std::vector<gr::tag_t>> d_tags;
 
-    int d_argc;
-    char* d_argv;
+    // Required now for Qt; argc must be greater than 0 and argv
+    // must have at least one valid character. Must be valid through
+    // life of the qApplication:
+    // http://harmattan-dev.nokia.com/docs/library/html/qt4/qapplication.html
+    char d_zero = 0;
+    int d_argc = 1;
+    char* d_argv = &d_zero;
     QWidget* d_parent;
-    EyeDisplayForm* d_main_gui;
+    EyeDisplayForm* d_main_gui = nullptr;
 
     gr::high_res_timer_type d_update_time;
     gr::high_res_timer_type d_last_time;
@@ -68,67 +75,73 @@ public:
                     double samp_rate,
                     unsigned int nconnections,
                     QWidget* parent = NULL);
-    ~eye_sink_c_impl();
+    ~eye_sink_c_impl() override;
 
-    bool check_topology(int ninputs, int noutputs);
+    // Disallow copy/move because of the raw pointers.
+    eye_sink_c_impl(const eye_sink_c_impl&) = delete;
+    eye_sink_c_impl& operator=(const eye_sink_c_impl&) = delete;
+    eye_sink_c_impl(eye_sink_c_impl&&) = delete;
+    eye_sink_c_impl& operator=(eye_sink_c_impl&&) = delete;
 
-    void exec_();
-    QWidget* qwidget();
+    bool check_topology(int ninputs, int noutputs) override;
+
+    void exec_() override;
+    QWidget* qwidget() override;
 
 #ifdef ENABLE_PYTHON
-    PyObject* pyqwidget();
+    PyObject* pyqwidget() override;
 #else
     void* pyqwidget();
 #endif
 
-    void set_y_axis(double min, double max);
-    void set_y_label(const std::string& label, const std::string& unit = "");
-    void set_update_time(double t);
-    void set_samp_per_symbol(unsigned int sps);
-    void set_line_label(unsigned int which, const std::string& label);
-    void set_line_color(unsigned int which, const std::string& color);
-    void set_line_width(unsigned int which, int width);
-    void set_line_style(unsigned int which, int style);
-    void set_line_marker(unsigned int which, int marker);
-    void set_nsamps(const int size);
-    void set_samp_rate(const double samp_rate);
-    void set_line_alpha(unsigned int which, double alpha);
+    void set_y_axis(double min, double max) override;
+    void set_y_label(const std::string& label, const std::string& unit = "") override;
+    void set_update_time(double t) override;
+    void set_samp_per_symbol(unsigned int sps) override;
+    void set_line_label(unsigned int which, const std::string& label) override;
+    void set_line_color(unsigned int which, const std::string& color) override;
+    void set_line_width(unsigned int which, int width) override;
+    void set_line_style(unsigned int which, int style) override;
+    void set_line_marker(unsigned int which, int marker) override;
+    void set_nsamps(const int size) override;
+    void set_samp_rate(const double samp_rate) override;
+    void set_line_alpha(unsigned int which, double alpha) override;
     void set_trigger_mode(gr::qtgui::trigger_mode mode,
                           gr::qtgui::trigger_slope slope,
                           float level,
                           float delay,
                           int channel,
-                          const std::string& tag_key = "");
+                          const std::string& tag_key = "") override;
 
-    std::string title();
-    std::string line_label(unsigned int which);
-    std::string line_color(unsigned int which);
-    int line_width(unsigned int which);
-    int line_style(unsigned int which);
-    int line_marker(unsigned int which);
-    double line_alpha(unsigned int which);
+    std::string title() override;
+    std::string line_label(unsigned int which) override;
+    std::string line_color(unsigned int which) override;
+    int line_width(unsigned int which) override;
+    int line_style(unsigned int which) override;
+    int line_marker(unsigned int which) override;
+    double line_alpha(unsigned int which) override;
 
-    void set_size(int width, int height);
+    void set_size(int width, int height) override;
 
-    int nsamps() const;
+    int nsamps() const override;
 
-    void enable_menu(bool en);
-    void enable_grid(bool en);
-    void enable_autoscale(bool en);
-    void enable_stem_plot(bool en); // Used by parent class, do not remove
-    void enable_semilogx(bool en);  // Used by parent class, do not remove
-    void enable_semilogy(bool en);  // Used by parent class, do not remove
-    void enable_control_panel(bool en);
-    void enable_tags(unsigned int which, bool en);
-    void enable_tags(bool en);
-    void enable_axis_labels(bool en);
-    void disable_legend();
+    void enable_menu(bool en) override;
+    void enable_grid(bool en) override;
+    void enable_autoscale(bool en) override;
+    void enable_stem_plot(bool en) override; // Used by parent class, do not remove
+    void enable_semilogx(bool en) override;  // Used by parent class, do not remove
+    void enable_semilogy(bool en) override;  // Used by parent class, do not remove
+    void enable_control_panel(bool en) override;
+    void enable_tags(unsigned int which, bool en) override;
+    void enable_tags(bool en) override;
+    void enable_axis_labels(bool en) override;
+    void disable_legend() override;
 
-    void reset();
+    void reset() override;
 
     int work(int noutput_items,
              gr_vector_const_void_star& input_items,
-             gr_vector_void_star& output_items);
+             gr_vector_void_star& output_items) override;
 };
 
 } // namespace qtgui

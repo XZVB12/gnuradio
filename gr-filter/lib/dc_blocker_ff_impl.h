@@ -22,7 +22,6 @@ class moving_averager_f
 {
 public:
     moving_averager_f(int D);
-    ~moving_averager_f();
 
     float filter(float x);
     float delayed_sig() { return d_out; }
@@ -47,15 +46,13 @@ private:
 public:
     dc_blocker_ff_impl(int D, bool long_form);
 
-    ~dc_blocker_ff_impl();
-
-    int group_delay();
+    int group_delay() override;
 
     // int set_length(int D);
 
     int work(int noutput_items,
              gr_vector_const_void_star& input_items,
-             gr_vector_void_star& output_items);
+             gr_vector_void_star& output_items) override;
 };
 
 } /* namespace filter */

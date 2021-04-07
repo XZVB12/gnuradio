@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(sync_block.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(a4c0cf64175558267b81683da25f8caa)                     */
+/* BINDTOOL_HEADER_FILE_HASH(f07d137348bdb66189b791e6993f0762)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -43,13 +43,6 @@ void bind_sync_block(py::module& m)
              py::arg("input_items"),
              py::arg("output_items"),
              D(sync_block, work))
-
-
-        .def("forecast",
-             &sync_block::forecast,
-             py::arg("noutput_items"),
-             py::arg("ninput_items_required"),
-             D(sync_block, forecast))
 
 
         .def("general_work",

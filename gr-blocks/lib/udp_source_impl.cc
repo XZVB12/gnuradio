@@ -16,11 +16,9 @@
 #include <gnuradio/io_signature.h>
 #include <gnuradio/math.h>
 #include <gnuradio/prefs.h>
-#include <errno.h>
-#include <stdio.h>
-#include <string.h>
-#include <boost/make_unique.hpp>
-#include <stdexcept>
+#include <cstddef>
+#include <cstring>
+#include <memory>
 
 namespace gr {
 namespace blocks {
@@ -74,7 +72,7 @@ void udp_source_impl::connect(const std::string& host, int port)
             d_host, s_port, boost::asio::ip::resolver_query_base::passive);
         d_endpoint = *resolver.resolve(query);
 
-        d_socket = boost::make_unique<boost::asio::ip::udp::socket>(d_io_service);
+        d_socket = std::make_unique<boost::asio::ip::udp::socket>(d_io_service);
         d_socket->open(d_endpoint.protocol());
 
         boost::asio::socket_base::reuse_address roption(true);
@@ -179,12 +177,12 @@ int udp_source_impl::work(int noutput_items,
         return d_residual;
     }
 
-    int bytes_left_in_buffer = (int)(d_residual - d_sent);
-    int bytes_to_send = std::min<int>(d_itemsize * noutput_items, bytes_left_in_buffer);
+    const std::ptrdiff_t bytes_left_in_buffer = d_residual - d_sent;
+    auto bytes_to_send =
+        std::min<std::ptrdiff_t>(d_itemsize * noutput_items, bytes_left_in_buffer);
 
     // Copy the received data in the residual buffer to the output stream
     memcpy(out, d_residbuf.data() + d_sent, bytes_to_send);
-    int nitems = bytes_to_send / d_itemsize;
 
     // Keep track of where we are if we don't have enough output
     // space to send all the data in the residbuf.
@@ -195,7 +193,7 @@ int udp_source_impl::work(int noutput_items,
         d_sent += bytes_to_send;
     }
 
-    return nitems;
+    return bytes_to_send / d_itemsize;
 }
 
 } /* namespace blocks */

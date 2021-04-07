@@ -56,8 +56,8 @@ public:
      *             Populates the filters.
      */
     filterbank(const std::vector<std::vector<float>>& taps);
-
-    ~filterbank();
+    filterbank(filterbank&&) = default;
+    virtual ~filterbank() = default;
 
     /*!
      * Update the filterbank's filter taps.

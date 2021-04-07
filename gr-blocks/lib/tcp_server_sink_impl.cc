@@ -15,13 +15,13 @@
 #include "tcp_server_sink_impl.h"
 #include <gnuradio/io_signature.h>
 #include <gnuradio/thread/thread.h>
-#include <stdio.h>
-#include <string.h>
 #include <boost/array.hpp>
 #include <boost/asio.hpp>
 #include <boost/format.hpp>
-#include <boost/make_unique.hpp>
 #include <algorithm>
+#include <cstdio>
+#include <cstring>
+#include <memory>
 #include <stdexcept>
 
 namespace gr {
@@ -57,12 +57,12 @@ tcp_server_sink_impl::tcp_server_sink_impl(size_t itemsize,
     d_acceptor.listen();
 
     if (!noblock) {
-        auto sock = boost::make_unique<boost::asio::ip::tcp::socket>(d_io_service);
+        auto sock = std::make_unique<boost::asio::ip::tcp::socket>(d_io_service);
         d_acceptor.accept(*sock, d_endpoint);
         d_sockets.insert(std::move(sock));
     }
 
-    d_socket = boost::make_unique<boost::asio::ip::tcp::socket>(d_io_service);
+    d_socket = std::make_unique<boost::asio::ip::tcp::socket>(d_io_service);
     d_acceptor.async_accept(*d_socket,
                             boost::bind(&tcp_server_sink_impl::do_accept,
                                         this,
@@ -76,7 +76,7 @@ void tcp_server_sink_impl::do_accept(const boost::system::error_code& error)
     if (!error) {
         gr::thread::scoped_lock guard(d_writing_mut);
         d_sockets.insert(std::move(d_socket));
-        d_socket = boost::make_unique<boost::asio::ip::tcp::socket>(d_io_service);
+        d_socket = std::make_unique<boost::asio::ip::tcp::socket>(d_io_service);
         d_acceptor.async_accept(*d_socket,
                                 boost::bind(&tcp_server_sink_impl::do_accept,
                                             this,

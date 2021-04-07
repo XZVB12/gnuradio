@@ -41,9 +41,9 @@ class QwtTimeScaleDraw : public QwtScaleDraw, public TimeScaleData
 public:
     QwtTimeScaleDraw() : QwtScaleDraw(), TimeScaleData() {}
 
-    virtual ~QwtTimeScaleDraw() {}
+    ~QwtTimeScaleDraw() override {}
 
-    virtual QwtText label(double value) const
+    QwtText label(double value) const override
     {
         double secs = double(value * getSecondsPerLine());
         return QwtText(QString::number(secs, 'e', 2));
@@ -80,7 +80,7 @@ public:
         setTrackerMode(QwtPicker::AlwaysOn);
     }
 
-    virtual ~WaterfallZoomer() {}
+    ~WaterfallZoomer() override {}
 
     virtual void updateTrackerText() { updateDisplay(); }
 
@@ -88,7 +88,7 @@ public:
 
 protected:
     using QwtPlotZoomer::trackerText;
-    virtual QwtText trackerText(QPoint const& p) const
+    QwtText trackerText(QPoint const& p) const override
     {
         QwtDoublePoint dp = QwtPlotZoomer::invTransform(p);
         double secs = double(dp.y() * getSecondsPerLine());
@@ -158,7 +158,7 @@ WaterfallDisplayPlot::WaterfallDisplayPlot(int nplots, QWidget* parent)
     setAlpha(0, 255);
 
     // LeftButton for the zooming
-    // MidButton for the panning
+    // MiddleButton for the panning
     // RightButton: zoom out by 1
     // Ctrl+RighButton: zoom out to full size
     d_zoomer = new WaterfallZoomer(canvas(), 0);

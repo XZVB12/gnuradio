@@ -12,7 +12,7 @@
 
 #include <gnuradio/qtgui/DisplayPlot.h>
 #include <gnuradio/tags.h>
-#include <stdint.h>
+#include <cstdint>
 #include <cstdio>
 #include <vector>
 
@@ -32,7 +32,13 @@ class EyeDisplayPlot : public DisplayPlot
 
 public:
     EyeDisplayPlot(unsigned int nplots, unsigned int curve_index, QWidget* parent);
-    virtual ~EyeDisplayPlot();
+    ~EyeDisplayPlot() override;
+
+    // Disable copy&move because of raw QT pointers.
+    EyeDisplayPlot(const EyeDisplayPlot&) = delete;
+    EyeDisplayPlot(EyeDisplayPlot&&) = delete;
+    EyeDisplayPlot& operator=(const EyeDisplayPlot&) = delete;
+    EyeDisplayPlot& operator=(EyeDisplayPlot&&) = delete;
 
     void plotNewData(const std::vector<double*> dataPoints,
                      const int64_t numDataPoints,
@@ -41,7 +47,7 @@ public:
                      const std::vector<std::vector<gr::tag_t>>& tags =
                          std::vector<std::vector<gr::tag_t>>());
 
-    void replot();
+    void replot() override;
 
     void stemPlot(bool en);
 
@@ -50,11 +56,11 @@ public:
     const QColor getTagTextColor();
     const QColor getTagBackgroundColor();
     const Qt::BrushStyle getTagBackgroundStyle();
-    void setLineColor(unsigned int which, QColor color);
-    void setLineWidth(unsigned int which, int width);
-    void setLineMarker(unsigned int which, QwtSymbol::Style marker);
-    void setLineStyle(unsigned int which, Qt::PenStyle style);
-    void setMarkerAlpha(unsigned int which, int alpha);
+    void setLineColor(unsigned int which, QColor color) override;
+    void setLineWidth(unsigned int which, int width) override;
+    void setLineMarker(unsigned int which, QwtSymbol::Style marker) override;
+    void setLineStyle(unsigned int which, Qt::PenStyle style) override;
+    void setMarkerAlpha(unsigned int which, int alpha) override;
 
 public slots:
     void setSampleRate(double sr, double units, const std::string& strunits);
@@ -62,8 +68,8 @@ public slots:
     void setAutoScale(bool state);
     void setAutoScaleShot();
 
-    void legendEntryChecked(QwtPlotItem* plotItem, bool on);
-    void legendEntryChecked(const QVariant& plotItem, bool on, int index);
+    void legendEntryChecked(QwtPlotItem* plotItem, bool on) override;
+    void legendEntryChecked(const QVariant& plotItem, bool on, int index) override;
 
     void enableTagMarker(unsigned int which, bool en);
 
@@ -76,22 +82,21 @@ public slots:
     void setTagBackgroundColor(QColor c);
     void setTagBackgroundStyle(Qt::BrushStyle b);
 
-    void setLineLabel(unsigned int which, QString label);
+    void setLineLabel(unsigned int which, QString label) override;
 
 private:
     void _resetXAxisPoints();
     void _autoScale(double bottom, double top);
 
-    std::vector<double*> d_ydata;
+    std::vector<std::vector<double>> d_ydata;
 
-    double* d_xdata;
+    std::vector<double> d_xdata;
 
     double d_sample_rate;
 
     unsigned int d_curve_index;
-    unsigned int nplots;
-    int d_sps;
-    unsigned int d_numPointsPerPeriod;
+    int d_sps = 4;
+    unsigned int d_numPointsPerPeriod = 2 * d_sps + 1;
     unsigned int d_numPeriods;
 
     bool d_autoscale_shot;

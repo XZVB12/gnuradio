@@ -1,8 +1,7 @@
-"""Copyright 2016 Free Software Foundation, Inc.
+"""Copyright 2021 The GNU Radio Contributors
 This file is part of GNU Radio
 
 SPDX-License-Identifier: GPL-2.0-or-later
-
 """
 
 
@@ -24,6 +23,7 @@ class Config(object):
         self._gr_prefs = prefs if prefs else DummyPrefs()
         self.version = version
         self.version_parts = version_parts or version[1:].split('-', 1)[0].split('.')[:3]
+        self.enabled_components = self._gr_prefs.get_string('grc', 'enabled_components', '')
         if name:
             self.name = name
 

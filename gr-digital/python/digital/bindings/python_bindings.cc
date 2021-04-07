@@ -28,6 +28,7 @@ void bind_clock_recovery_mm_ff(py::module&);
 void bind_cma_equalizer_cc(py::module&);
 void bind_constellation(py::module&);
 void bind_constellation_decoder_cb(py::module&);
+void bind_constellation_encoder_bc(py::module&);
 void bind_constellation_receiver_cb(py::module&);
 void bind_constellation_soft_decoder_cf(py::module&);
 void bind_corr_est_cc(py::module&);
@@ -120,6 +121,7 @@ PYBIND11_MODULE(digital_python, m)
 
     // Allow access to base block methods
     py::module::import("gnuradio.gr");
+    py::module::import("gnuradio.blocks");
 
     bind_adaptive_algorithm(m);
     bind_adaptive_algorithm_cma(m);
@@ -134,6 +136,7 @@ PYBIND11_MODULE(digital_python, m)
     bind_cma_equalizer_cc(m);
     bind_constellation(m);
     bind_constellation_decoder_cb(m);
+    bind_constellation_encoder_bc(m);
     bind_constellation_receiver_cb(m);
     bind_constellation_soft_decoder_cf(m);
     bind_corr_est_cc(m);

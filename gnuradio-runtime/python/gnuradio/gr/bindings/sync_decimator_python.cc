@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(sync_decimator.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(b6dc9db79f929ad2a09fbd28c6ee3f9a)                     */
+/* BINDTOOL_HEADER_FILE_HASH(093d5d333e9d0c9d14c71cc5c469942b)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -47,13 +47,6 @@ void bind_sync_decimator(py::module& m)
              &sync_decimator::set_decimation,
              py::arg("decimation"),
              D(sync_decimator, set_decimation))
-
-
-        .def("forecast",
-             &sync_decimator::forecast,
-             py::arg("noutput_items"),
-             py::arg("ninput_items_required"),
-             D(sync_decimator, forecast))
 
 
         .def("general_work",

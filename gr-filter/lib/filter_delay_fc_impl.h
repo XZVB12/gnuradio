@@ -28,14 +28,13 @@ private:
 
 public:
     filter_delay_fc_impl(const std::vector<float>& taps);
-    ~filter_delay_fc_impl();
 
     std::vector<float> taps();
     void set_taps(const std::vector<float>& taps);
 
     int work(int noutput_items,
              gr_vector_const_void_star& input_items,
-             gr_vector_void_star& output_items);
+             gr_vector_void_star& output_items) override;
 };
 
 } /* namespace filter */

@@ -14,6 +14,7 @@
 #include <gnuradio/qtgui/sink_c.h>
 
 #include <gnuradio/fft/fft.h>
+#include <gnuradio/fft/window.h>
 #include <gnuradio/filter/firdes.h>
 #include <gnuradio/high_res_timer.h>
 #include <gnuradio/qtgui/SpectrumGUIClass.h>
@@ -24,12 +25,12 @@ namespace qtgui {
 class QTGUI_API sink_c_impl : public sink_c
 {
 private:
-    void forecast(int noutput_items, gr_vector_int& ninput_items_required);
+    void forecast(int noutput_items, gr_vector_int& ninput_items_required) override;
 
     void initialize();
 
     int d_fftsize;
-    filter::firdes::win_type d_wintype;
+    fft::window::win_type d_wintype;
     std::vector<float> d_window;
     double d_center_freq;
     double d_bandwidth;
@@ -39,21 +40,23 @@ private:
 
     const pmt::pmt_t d_port;
 
-    bool d_shift;
-    fft::fft_complex* d_fft;
+    // Perform fftshift operation;
+    // this is usually desired when plotting
+    std::unique_ptr<fft::fft_complex_fwd> d_fft;
 
-    int d_index;
-    gr_complex* d_residbuf;
-    float* d_magbuf;
+    int d_index = 0;
+    volk::vector<gr_complex> d_residbuf;
+    volk::vector<float> d_magbuf;
 
     bool d_plotfreq, d_plotwaterfall, d_plottime, d_plotconst;
 
     gr::high_res_timer_type d_update_time;
 
-    int d_argc;
-    char* d_argv;
+    int d_argc = 1;
+    char zero = 0;
+    char* d_argv = &zero;
     QWidget* d_parent;
-    SpectrumGUIClass* d_main_gui;
+    SpectrumGUIClass d_main_gui;
 
     void windowreset();
     void buildwindow();
@@ -76,37 +79,38 @@ public:
                 bool plottime,
                 bool plotconst,
                 QWidget* parent);
-    ~sink_c_impl();
+    ~sink_c_impl() override;
+    // Disallow copy/move because of the pointers.
+    sink_c_impl(const sink_c_impl&) = delete;
+    sink_c_impl(sink_c_impl&&) = delete;
+    sink_c_impl& operator=(const sink_c_impl&) = delete;
+    sink_c_impl& operator=(sink_c_impl&&) = delete;
 
-    bool check_topology(int ninputs, int noutputs);
 
-    void exec_();
-    QWidget* qwidget();
+    bool check_topology(int ninputs, int noutputs) override;
+
+    void exec_() override;
+    QWidget* qwidget() override;
 
 #ifdef ENABLE_PYTHON
-    PyObject* pyqwidget();
+    PyObject* pyqwidget() override;
 #else
     void* pyqwidget();
 #endif
 
-    void set_fft_size(const int fftsize);
-    int fft_size() const;
+    void set_fft_size(const int fftsize) override;
+    int fft_size() const override;
 
-    void set_frequency_range(const double centerfreq, const double bandwidth);
-    void set_fft_power_db(double min, double max);
-    void enable_rf_freq(bool en);
+    void set_frequency_range(const double centerfreq, const double bandwidth) override;
+    void set_fft_power_db(double min, double max) override;
+    void enable_rf_freq(bool en) override;
 
-    // void set_time_domain_axis(double min, double max);
-    // void set_constellation_axis(double xmin, double xmax,
-    //                            double ymin, double ymax);
-    // void set_constellation_pen_size(int size);
-
-    void set_update_time(double t);
+    void set_update_time(double t) override;
 
     int general_work(int noutput_items,
                      gr_vector_int& ninput_items,
                      gr_vector_const_void_star& input_items,
-                     gr_vector_void_star& output_items);
+                     gr_vector_void_star& output_items) override;
 };
 
 } /* namespace qtgui */

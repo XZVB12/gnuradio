@@ -15,12 +15,12 @@
 #include "udp_sink_impl.h"
 #include <gnuradio/io_signature.h>
 #include <gnuradio/thread/thread.h>
-#include <stdio.h>
-#include <string.h>
 #include <boost/array.hpp>
 #include <boost/asio.hpp>
 #include <boost/format.hpp>
-#include <boost/make_unique.hpp>
+#include <cstddef>
+#include <cstring>
+#include <memory>
 #include <stdexcept>
 
 namespace gr {
@@ -65,7 +65,7 @@ void udp_sink_impl::connect(const std::string& host, int port)
             host, s_port, boost::asio::ip::resolver_query_base::passive);
         d_endpoint = *resolver.resolve(query);
 
-        d_socket = boost::make_unique<boost::asio::ip::udp::socket>(d_io_service);
+        d_socket = std::make_unique<boost::asio::ip::udp::socket>(d_io_service);
         d_socket->open(d_endpoint.protocol());
 
         boost::asio::socket_base::reuse_address roption(true);
@@ -101,13 +101,15 @@ int udp_sink_impl::work(int noutput_items,
                         gr_vector_void_star& output_items)
 {
     const char* in = (const char*)input_items[0];
-    ssize_t r = 0, bytes_sent = 0, bytes_to_send = 0;
-    ssize_t total_size = noutput_items * d_itemsize;
+    size_t r = 0;
+    std::ptrdiff_t bytes_sent = 0, bytes_to_send = 0;
+    const size_t total_size = noutput_items * d_itemsize;
 
     gr::thread::scoped_lock guard(d_mutex); // protect d_socket
 
-    while (bytes_sent < total_size) {
-        bytes_to_send = std::min((ssize_t)d_payload_size, (total_size - bytes_sent));
+    while (bytes_sent < static_cast<std::ptrdiff_t>(total_size)) {
+        bytes_to_send = std::min(static_cast<std::ptrdiff_t>(d_payload_size),
+                                 static_cast<std::ptrdiff_t>(total_size - bytes_sent));
 
         if (d_connected) {
             try {

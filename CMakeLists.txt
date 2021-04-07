@@ -1,4 +1,4 @@
-# Copyright 2011-2012,2014,2017 Free Software Foundation, Inc.
+# Copyright 2011-2021 Free Software Foundation, Inc.
 #
 # This file is part of GNU Radio
 #
@@ -34,28 +34,42 @@ GR_CHECK_BUILD_TYPE(${CMAKE_BUILD_TYPE})
 SET(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "")
 message(STATUS "Build type set to ${CMAKE_BUILD_TYPE}.")
 
+# Set the build date
+string(TIMESTAMP BUILD_DATE "%a, %d %b %Y %H:%M:%SZ" UTC)
+string(TIMESTAMP BUILD_DATE_SHORT "%Y-%m-%d" UTC)
+message(STATUS "Build date set to ${BUILD_DATE}.")
+
 include(GrComponent)
-GR_REGISTER_COMPONENT("testing-support" ENABLE_TESTING)
+########################################################################
+# Setup Boost for global use (within this build)
+# Do this before enabling testing support, as it depends
+# on unit_test_framework
+########################################################################
+include(GrBoost)
+GR_REGISTER_COMPONENT("testing-support" ENABLE_TESTING
+         Boost_UNIT_TEST_FRAMEWORK_FOUND )
 
 # Set the version information here
 SET(VERSION_MAJOR 3)
-SET(VERSION_API   9)
+SET(VERSION_API   10)
 SET(VERSION_ABI   0)
-SET(VERSION_PATCH 0-git)
+SET(VERSION_PATCH git)
 include(GrVersion) #setup version info
 
 # Minimum dependency versions for central dependencies:
-set(GR_BOOST_MIN_VERSION "1.58")
-set(GR_CMAKE_MIN_VERSION "3.5.1")
-set(GR_MAKO_MIN_VERSION "0.4.2")
-set(GR_PYTHON_MIN_VERSION "3.6.5")
-set(GR_NUMPY_MIN_VERSION "1.13.0")
-set(GCC_MIN_VERSION "4.8.4")
-set(CLANG_MIN_VERSION "3.4.0")
-set(APPLECLANG_MIN_VERSION "500")
-set(MSVC_MIN_VERSION "1800")
-set(VOLK_MIN_VERSION "2.1.0")
-set(PYBIND11_MIN_VERSION "2.4") # pybind11 sets versions like 2.4.dev4, which compares < 2.4.3
+
+set(GR_BOOST_MIN_VERSION "1.65")      ## Version in Ubuntu 18.04LTS
+set(GR_CMAKE_MIN_VERSION "3.10.2")    ## Version in Ubuntu 18.04LTS
+set(GR_MAKO_MIN_VERSION "1.0.7")      ## debian buster, 18.04LTS
+set(GR_PYTHON_MIN_VERSION "3.6.5")    ## Version in Ubuntu 18.04LTS
+set(GR_NUMPY_MIN_VERSION "1.13.3")    ## Version in Ubuntu 18.04LTS
+set(GCC_MIN_VERSION "8.3.0")          ## debian buster
+set(CLANG_MIN_VERSION "11.0.0")       ## debian bullseye, Fedora 33
+set(APPLECLANG_MIN_VERSION "1100")    ## same as clang 11.0.0, in Xcode11
+set(MSVC_MIN_VERSION "1914")          ## VS2017 15.7, for full-ish C++17 support
+set(VOLK_MIN_VERSION "2.4.1")         ## first version with CPU features
+set(PYBIND11_MIN_VERSION "2.4")       # pybind11 sets versions like 2.4.dev4, which compares < 2.4.3
+set(GR_THRIFT_MIN_VERSION "0.13")
 
 # Enable generation of compile_commands.json for code completion engines
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -118,7 +132,7 @@ ENDIF()
 
 set(CMAKE_C_EXTENSIONS OFF)
 set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD 11)
 
 ########################################################################
@@ -180,7 +194,6 @@ if(MSVC)
         -D_CRT_SECURE_NO_DEPRECATE
         -D_CRT_NONSTDC_NO_DEPRECATE
     )
-    add_definitions(-DHAVE_CONFIG_H)
     add_compile_options(/MP) #build with multiple processors
     add_compile_options(/bigobj) #allow for larger object files
 endif(MSVC)
@@ -240,6 +253,7 @@ SET(GR_DATA_DIR        share CACHE PATH "Base location for data")
 SET(GR_PKG_DATA_DIR    ${GR_DATA_DIR}/${CMAKE_PROJECT_NAME} CACHE PATH "Path to install package data")
 SET(GR_DOC_DIR         ${GR_DATA_DIR}/doc CACHE PATH "Path to install documentation")
 SET(GR_PKG_DOC_DIR     ${GR_DOC_DIR}/${CMAKE_PROJECT_NAME}-${DOCVER} CACHE PATH "Path to install package docs")
+SET(GR_MAN_DIR         ${GR_DATA_DIR}/man CACHE PATH "Path to install man pages")
 SET(GR_LIBEXEC_DIR     libexec CACHE PATH "Path to install libexec files")
 SET(GR_PKG_LIBEXEC_DIR ${GR_LIBEXEC_DIR}/${CMAKE_PROJECT_NAME} CACHE PATH "Path to install package libexec files")
 SET(GRC_BLOCKS_DIR     ${GR_PKG_DATA_DIR}/grc/blocks CACHE PATH "Path to install GRC blocks")
@@ -271,12 +285,20 @@ endif(ENABLE_PERFORMANCE_COUNTERS)
 ########################################################################
 # Variables replaced when configuring the package config files
 ########################################################################
-file(TO_NATIVE_PATH "${CMAKE_INSTALL_PREFIX}"           prefix)
-file(TO_NATIVE_PATH "\${prefix}"                        exec_prefix)
-file(TO_NATIVE_PATH "\${exec_prefix}/${GR_LIBRARY_DIR}" libdir)
-file(TO_NATIVE_PATH "\${prefix}/${GR_INCLUDE_DIR}"      includedir)
-file(TO_NATIVE_PATH "${SYSCONFDIR}"                     SYSCONFDIR)
-file(TO_NATIVE_PATH "${GR_PREFSDIR}"                    GR_PREFSDIR)
+file(TO_CMAKE_PATH "${CMAKE_INSTALL_PREFIX}"           prefix)
+file(TO_CMAKE_PATH "\${prefix}"                        exec_prefix)
+file(TO_CMAKE_PATH "\${exec_prefix}/${GR_LIBRARY_DIR}" libdir)
+file(TO_CMAKE_PATH "\${prefix}/${GR_INCLUDE_DIR}"      includedir)
+file(TO_CMAKE_PATH "${SYSCONFDIR}"                     SYSCONFDIR)
+file(TO_CMAKE_PATH "${GR_PREFSDIR}"                    GR_PREFSDIR)
+
+if(WIN32)
+    file(RELATIVE_PATH prefix_relative_to_lib "${prefix}/${GR_RUNTIME_DIR}" "${prefix}")
+else(WIN32)
+    file(RELATIVE_PATH prefix_relative_to_lib "${prefix}/${GR_LIBRARY_DIR}" "${prefix}")
+endif(WIN32)
+file(RELATIVE_PATH SYSCONFDIR_relative_to_prefix "${prefix}" "${SYSCONFDIR}")
+file(RELATIVE_PATH GR_PREFSDIR_relative_to_prefix "${prefix}" "${GR_PREFSDIR}")
 
 ########################################################################
 # On Apple only, set install name and use rpath correctly, if not already set
@@ -311,11 +333,6 @@ add_custom_target(uninstall
 )
 
 ########################################################################
-# Setup Boost for global use (within this build)
-########################################################################
-include(GrBoost)
-
-########################################################################
 # Enable python component
 ########################################################################
 include(GrPython)
@@ -341,6 +358,9 @@ execute_process(
     COMMAND "${PYTHON_EXECUTABLE}" -c
     "try:\n import numpy\n import os\n inc_path = numpy.get_include()\n if os.path.exists(os.path.join(inc_path, 'numpy', 'arrayobject.h')):\n  print(inc_path, end='')\nexcept:\n pass"
     OUTPUT_VARIABLE PYTHON_NUMPY_INCLUDE_DIR)
+# format path in CMake-style for consistency with other path variables
+# (a consistent style helps conda builds by using the same path separators)
+file(TO_CMAKE_PATH "${PYTHON_NUMPY_INCLUDE_DIR}" PYTHON_NUMPY_INCLUDE_DIR)
 
 include(GrComponent)
 GR_REGISTER_COMPONENT("python-support" ENABLE_PYTHON
@@ -461,6 +481,7 @@ add_subdirectory(gr-digital)
 add_subdirectory(gr-dtv)
 add_subdirectory(gr-audio)
 add_subdirectory(gr-channels)
+add_subdirectory(gr-pdu)
 add_subdirectory(gr-qtgui)
 add_subdirectory(gr-trellis)
 add_subdirectory(gr-uhd)
@@ -515,6 +536,7 @@ install(
   DESTINATION ${CMAKE_MODULES_DIR}/gnuradio
 )
 
+file(APPEND ${CMAKE_CURRENT_BINARY_DIR}/grc/grc.conf "enabled_components = ${_gr_enabled_components}")
 
 ########################################################################
 # Print summary
@@ -529,7 +551,7 @@ CONFIGURE_FILE(
   ${CMAKE_CURRENT_BINARY_DIR}/gnuradio-runtime/include/gnuradio/config.h
 )
 
-#Re-generate the constants file, now that we actually know which components will be enabled.
+# Re-generate the constants file, now that we actually know which components will be enabled.
 configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/gnuradio-runtime/lib/constants.cc.in
     ${CMAKE_CURRENT_BINARY_DIR}/gnuradio-runtime/lib/constants.cc

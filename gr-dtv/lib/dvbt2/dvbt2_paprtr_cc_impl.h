@@ -33,9 +33,8 @@ namespace dtv {
 class dvbt2_paprtr_cc_impl : public dvbt2_paprtr_cc
 {
 private:
-    const int papr_fft_size;
-    fft::fft_complex papr_fft;
-
+    fft::fft_complex_rev papr_fft;
+    int papr_fft_size;
     int num_symbols;
     int fft_size;
     int left_nulls;
@@ -95,11 +94,11 @@ public:
                          int iterations,
                          unsigned int vlength);
 
-    ~dvbt2_paprtr_cc_impl();
+    ~dvbt2_paprtr_cc_impl() override;
 
     int work(int noutput_items,
              gr_vector_const_void_star& input_items,
-             gr_vector_void_star& output_items);
+             gr_vector_void_star& output_items) override;
 };
 
 } // namespace dtv

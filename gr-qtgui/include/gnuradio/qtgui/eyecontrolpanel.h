@@ -27,7 +27,7 @@ class EyeControlPanel : public QVBoxLayout
 
 public:
     EyeControlPanel(EyeDisplayForm* form);
-    ~EyeControlPanel();
+    ~EyeControlPanel() override;
 
 public slots:
     void toggleAutoScale(bool en);
@@ -35,6 +35,7 @@ public slots:
     void toggleTriggerMode(gr::qtgui::trigger_mode mode);
     void toggleTriggerSlope(gr::qtgui::trigger_slope slope);
     void toggleStopButton();
+    void updateStopLabel(bool on);
 
 signals:
     void signalToggleStopButton();

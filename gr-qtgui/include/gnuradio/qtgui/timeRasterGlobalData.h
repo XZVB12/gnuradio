@@ -11,8 +11,8 @@
 #ifndef TIMERASTER_GLOBAL_DATA_HPP
 #define TIMERASTER_GLOBAL_DATA_HPP
 
-#include <inttypes.h>
 #include <qwt_raster_data.h>
+#include <cinttypes>
 
 #if QWT_VERSION >= 0x060000
 #include <qwt_compat.h>
@@ -23,7 +23,7 @@ class TimeRasterData : public QwtRasterData
 {
 public:
     TimeRasterData(const double rows, const double cols);
-    virtual ~TimeRasterData();
+    ~TimeRasterData() override;
 
     virtual void reset();
     virtual void copy(const TimeRasterData*);
@@ -37,7 +37,7 @@ public:
     virtual void setRange(const QwtDoubleInterval&);
 #endif
 
-    virtual double value(double x, double y) const;
+    double value(double x, double y) const override;
 
     virtual double getNumCols() const;
     virtual double getNumRows() const;
@@ -47,10 +47,10 @@ public:
     void incrementResidual();
 
 protected:
-    double* d_data;
+    std::vector<double> d_data;
     double d_rows, d_cols;
     double d_resid;
-    int d_nitems, d_totalitems, d_data_size;
+    int d_nitems, d_totalitems;
 
 #if QWT_VERSION < 0x060000
     QwtDoubleInterval d_intensityRange;

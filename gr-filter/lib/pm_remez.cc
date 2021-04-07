@@ -31,7 +31,7 @@
 
 #include <gnuradio/filter/pm_remez.h>
 #include <gnuradio/logger.h>
-#include <assert.h>
+#include <cassert>
 #include <cmath>
 #include <iostream>
 
@@ -299,7 +299,7 @@ static double compute_A(double freq, int r, double ad[], double x[], double y[])
  * int gridsize  - Number of elements in the dense frequency grid
  * double Grid[] - Frequencies on the dense grid [gridsize]
  * double D[]    - Desired response on the dense grid [gridsize]
- * double W[]    - Weight function on the desnse grid [gridsize]
+ * double W[]    - Weight function on the dense grid [gridsize]
  *
  * OUTPUT:
  * -------
@@ -536,7 +536,7 @@ static void freq_sample(int N, double A[], double h[], int symm)
  *
  * INPUT:
  * ------
- * int    r     - 1/2 the number of filter coeffiecients
+ * int    r     - 1/2 the number of filter coefficients
  * int    Ext[] - Indexes to extremal frequencies [r+1]
  * double E[]   - Error function on the dense grid [gridsize]
  *

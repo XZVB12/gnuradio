@@ -28,8 +28,8 @@ class FILTER_API fir_filter_with_buffer_fff
 {
 private:
     mutable volk::vector<float> d_output; // Temporary storage for one element.
-    const int d_align;
-    const int d_naligned;
+    int d_align;
+    int d_naligned;
     std::vector<float> d_taps;
     unsigned int d_ntaps;
     volk::vector<float> d_buffer_ptr;
@@ -54,8 +54,6 @@ public:
     fir_filter_with_buffer_fff& operator=(const fir_filter_with_buffer_fff&) = delete;
     fir_filter_with_buffer_fff(fir_filter_with_buffer_fff&&) = default;
     fir_filter_with_buffer_fff& operator=(fir_filter_with_buffer_fff&&) = default;
-
-    ~fir_filter_with_buffer_fff();
 
     // MANIPULATORS
 
@@ -130,8 +128,8 @@ class FILTER_API fir_filter_with_buffer_ccc
 {
 private:
     mutable volk::vector<gr_complex> d_output; // Temporary storage for one element.
-    const int d_align;
-    const int d_naligned;
+    int d_align;
+    int d_naligned;
     std::vector<gr_complex> d_taps;
     unsigned int d_ntaps;
     volk::vector<gr_complex> d_buffer_ptr;
@@ -156,8 +154,6 @@ public:
     fir_filter_with_buffer_ccc& operator=(const fir_filter_with_buffer_ccc&) = delete;
     fir_filter_with_buffer_ccc(fir_filter_with_buffer_ccc&&) = default;
     fir_filter_with_buffer_ccc& operator=(fir_filter_with_buffer_ccc&&) = default;
-
-    ~fir_filter_with_buffer_ccc();
 
     // MANIPULATORS
 
@@ -232,8 +228,8 @@ class FILTER_API fir_filter_with_buffer_ccf
 {
 private:
     mutable volk::vector<gr_complex> d_output; // Temporary storage for one element.
-    const int d_align;
-    const int d_naligned;
+    int d_align;
+    int d_naligned;
     std::vector<float> d_taps;
     unsigned int d_ntaps;
     volk::vector<gr_complex> d_buffer_ptr;
@@ -258,8 +254,6 @@ public:
     fir_filter_with_buffer_ccf& operator=(const fir_filter_with_buffer_ccf&) = delete;
     fir_filter_with_buffer_ccf(fir_filter_with_buffer_ccf&&) = default;
     fir_filter_with_buffer_ccf& operator=(fir_filter_with_buffer_ccf&&) = default;
-
-    ~fir_filter_with_buffer_ccf();
 
     // MANIPULATORS
 

@@ -572,7 +572,7 @@ int dvbt_pilot_gen::get_current_tpilot() const { return d_tps_carriers[d_tpilot_
 
 gr_complex dvbt_pilot_gen::get_tpilot_value(int tpilot)
 {
-    // TODO - it can be calculated at the beginnning
+    // TODO - it can be calculated at the beginning
     if (d_symbol_index == 0) {
         d_tps_carriers_val[d_tpilot_index] = gr_complex(2 * (0.5 - d_wk[tpilot]), 0);
     } else {
@@ -1041,7 +1041,7 @@ dvbt_reference_signals_impl::dvbt_reference_signals_impl(
       d_pg(config),
       d_ninput(ninput),
       d_noutput(noutput),
-      ofdm_fft(config.d_transmission_mode == T2k ? 2048 : 8192, false, 1),
+      ofdm_fft(config.d_transmission_mode == T2k ? 2048 : 8192, 1),
       ofdm_fft_size(config.d_transmission_mode == T2k ? 2048 : 8192),
       normalization(1.0 / std::sqrt(27.0 * config.d_payload_length))
 {

@@ -14,10 +14,11 @@
 #include <gnuradio/high_res_timer.h>
 #include <gnuradio/qtgui/api.h>
 #include <gnuradio/tags.h>
-#include <stdint.h>
+#include <volk/volk_alloc.hh>
 #include <QEvent>
 #include <QString>
 #include <complex>
+#include <cstdint>
 #include <vector>
 
 static constexpr int SpectrumUpdateEventType = 10005;
@@ -40,7 +41,7 @@ public:
                         const gr::high_res_timer_type generatedTimestamp,
                         const int droppedFFTFrames);
 
-    ~SpectrumUpdateEvent();
+    ~SpectrumUpdateEvent() override;
 
     const float* getFFTPoints() const;
     const double* getRealTimeDomainPoints() const;
@@ -55,11 +56,9 @@ public:
 
 protected:
 private:
-    float* _fftPoints;
-    double* _realDataTimeDomainPoints;
-    double* _imagDataTimeDomainPoints;
-    uint64_t _numFFTDataPoints;
-    uint64_t _numTimeDomainDataPoints;
+    std::vector<float> d_fft_points;
+    std::vector<double> d_real_data_time_domain_points;
+    std::vector<double> d_imag_data_time_domain_points;
     gr::high_res_timer_type _dataTimestamp;
     bool _repeatDataFlag;
     bool _lastOfMultipleUpdateFlag;
@@ -71,7 +70,7 @@ class SpectrumWindowCaptionEvent : public QEvent
 {
 public:
     SpectrumWindowCaptionEvent(const QString&);
-    ~SpectrumWindowCaptionEvent();
+    ~SpectrumWindowCaptionEvent() override;
     QString getLabel();
 
 protected:
@@ -83,7 +82,7 @@ class SpectrumWindowResetEvent : public QEvent
 {
 public:
     SpectrumWindowResetEvent();
-    ~SpectrumWindowResetEvent();
+    ~SpectrumWindowResetEvent() override;
 
 protected:
 private:
@@ -93,7 +92,7 @@ class SpectrumFrequencyRangeEvent : public QEvent
 {
 public:
     SpectrumFrequencyRangeEvent(const double, const double, const double);
-    ~SpectrumFrequencyRangeEvent();
+    ~SpectrumFrequencyRangeEvent() override;
     double GetCenterFrequency() const;
     double GetStartFrequency() const;
     double GetStopFrequency() const;
@@ -109,11 +108,11 @@ private:
 class TimeUpdateEvent : public QEvent
 {
 public:
-    TimeUpdateEvent(const std::vector<double*> timeDomainPoints,
+    TimeUpdateEvent(const std::vector<volk::vector<double>> timeDomainPoints,
                     const uint64_t numTimeDomainDataPoints,
                     const std::vector<std::vector<gr::tag_t>> tags);
 
-    ~TimeUpdateEvent();
+    ~TimeUpdateEvent() override;
 
     int which() const;
     const std::vector<double*> getTimeDomainPoints() const;
@@ -139,9 +138,10 @@ private:
 class FreqUpdateEvent : public QEvent
 {
 public:
-    FreqUpdateEvent(const std::vector<double*> dataPoints, const uint64_t numDataPoints);
+    FreqUpdateEvent(const std::vector<volk::vector<double>> dataPoints,
+                    const uint64_t numDataPoints);
 
-    ~FreqUpdateEvent();
+    ~FreqUpdateEvent() override;
 
     int which() const;
     const std::vector<double*> getPoints() const;
@@ -162,7 +162,7 @@ class SetFreqEvent : public QEvent
 {
 public:
     SetFreqEvent(const double, const double);
-    ~SetFreqEvent();
+    ~SetFreqEvent() override;
     double getCenterFrequency() const;
     double getBandwidth() const;
 
@@ -178,11 +178,11 @@ private:
 class QTGUI_API ConstUpdateEvent : public QEvent
 {
 public:
-    ConstUpdateEvent(const std::vector<double*> realDataPoints,
-                     const std::vector<double*> imagDataPoints,
+    ConstUpdateEvent(const std::vector<volk::vector<double>> realDataPoints,
+                     const std::vector<volk::vector<double>> imagDataPoints,
                      const uint64_t numDataPoints);
 
-    ~ConstUpdateEvent();
+    ~ConstUpdateEvent() override;
 
     int which() const;
     const std::vector<double*> getRealPoints() const;
@@ -207,11 +207,11 @@ private:
 class WaterfallUpdateEvent : public QEvent
 {
 public:
-    WaterfallUpdateEvent(const std::vector<double*> dataPoints,
+    WaterfallUpdateEvent(const std::vector<volk::vector<double>> dataPoints,
                          const uint64_t numDataPoints,
                          const gr::high_res_timer_type dataTimestamp);
 
-    ~WaterfallUpdateEvent();
+    ~WaterfallUpdateEvent() override;
 
     int which() const;
     const std::vector<double*> getPoints() const;
@@ -238,9 +238,9 @@ private:
 class TimeRasterUpdateEvent : public QEvent
 {
 public:
-    TimeRasterUpdateEvent(const std::vector<double*> dataPoints,
+    TimeRasterUpdateEvent(const std::vector<volk::vector<double>> dataPoints,
                           const uint64_t numDataPoints);
-    ~TimeRasterUpdateEvent();
+    ~TimeRasterUpdateEvent() override;
 
     int which() const;
     const std::vector<double*> getPoints() const;
@@ -261,7 +261,7 @@ class TimeRasterSetSize : public QEvent
 {
 public:
     TimeRasterSetSize(const double nrows, const double ncols);
-    ~TimeRasterSetSize();
+    ~TimeRasterSetSize() override;
 
     double nRows() const;
     double nCols() const;
@@ -280,9 +280,10 @@ private:
 class HistogramUpdateEvent : public QEvent
 {
 public:
-    HistogramUpdateEvent(const std::vector<double*> points, const uint64_t npoints);
+    HistogramUpdateEvent(const std::vector<volk::vector<double>> points,
+                         const uint64_t npoints);
 
-    ~HistogramUpdateEvent();
+    ~HistogramUpdateEvent() override;
 
     int which() const;
     const std::vector<double*> getDataPoints() const;
@@ -303,7 +304,7 @@ class HistogramSetAccumulator : public QEvent
 {
 public:
     HistogramSetAccumulator(const bool en);
-    ~HistogramSetAccumulator();
+    ~HistogramSetAccumulator() override;
 
     bool getAccumulator() const;
 
@@ -318,7 +319,7 @@ class HistogramClearEvent : public QEvent
 public:
     HistogramClearEvent() : QEvent(QEvent::Type(SpectrumUpdateEventType + 2)) {}
 
-    ~HistogramClearEvent() {}
+    ~HistogramClearEvent() override {}
 
     static QEvent::Type Type() { return QEvent::Type(SpectrumUpdateEventType + 2); }
 };
@@ -331,7 +332,7 @@ class NumberUpdateEvent : public QEvent
 {
 public:
     NumberUpdateEvent(const std::vector<float> samples);
-    ~NumberUpdateEvent();
+    ~NumberUpdateEvent() override;
 
     int which() const;
     const std::vector<float> getSamples() const;

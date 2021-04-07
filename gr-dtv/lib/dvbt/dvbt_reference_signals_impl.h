@@ -231,7 +231,7 @@ private:
     int d_ninput;
     int d_noutput;
 
-    fft::fft_complex ofdm_fft;
+    fft::fft_complex_rev ofdm_fft;
     int ofdm_fft_size;
     float normalization;
 
@@ -247,14 +247,14 @@ public:
                                 dvbt_transmission_mode_t transmission_mode = gr::dtv::T2k,
                                 int include_cell_id = 0,
                                 int cell_id = 0);
-    ~dvbt_reference_signals_impl();
+    ~dvbt_reference_signals_impl() override;
 
-    void forecast(int noutput_items, gr_vector_int& ninput_items_required);
+    void forecast(int noutput_items, gr_vector_int& ninput_items_required) override;
 
     int general_work(int noutput_items,
                      gr_vector_int& ninput_items,
                      gr_vector_const_void_star& input_items,
-                     gr_vector_void_star& output_items);
+                     gr_vector_void_star& output_items) override;
 };
 
 } // namespace dtv

@@ -14,7 +14,7 @@
 /* BINDTOOL_GEN_AUTOMATIC(0)                                                       */
 /* BINDTOOL_USE_PYGCCXML(0)                                                        */
 /* BINDTOOL_HEADER_FILE(tagged_stream_block.h)                                        */
-/* BINDTOOL_HEADER_FILE_HASH(03f4139c3fd58d7c80fde38da58ef670)                     */
+/* BINDTOOL_HEADER_FILE_HASH(635b767c5146a5d65f0757f7fb26a904)                     */
 /***********************************************************************************/
 
 #include <pybind11/complex.h>
@@ -38,13 +38,6 @@ void bind_tagged_stream_block(py::module& m)
                gr::basic_block,
                std::shared_ptr<tagged_stream_block>>(
         m, "tagged_stream_block", D(tagged_stream_block))
-
-
-        .def("forecast",
-             &tagged_stream_block::forecast,
-             py::arg("noutput_items"),
-             py::arg("ninput_items_required"),
-             D(tagged_stream_block, forecast))
 
 
         .def("check_topology",

@@ -11,17 +11,18 @@
 
 from gnuradio import gr, gr_unittest, qtgui
 
+
 class test_qtgui(gr_unittest.TestCase):
 
-    def setUp (self):
-        self.tb = gr.top_block ()
+    def setUp(self):
+        self.tb = gr.top_block()
 
-    def tearDown (self):
+    def tearDown(self):
         self.tb = None
 
     # Tests to make sure we can instantiate the sink.
-    # We use '5' in place of filter.firdes.WIN_BLACKMAN_hARRIS so we
-    # don't have to worry about importing filter just for this one
+    # We use '5' in place of fft.window.WIN_BLACKMAN_hARRIS so we
+    # don't have to worry about importing fft just for this one
     # constant.
     def test01(self):
         self.qtsnk = qtgui.sink_c(1024, 5,
@@ -77,5 +78,6 @@ class test_qtgui(gr_unittest.TestCase):
     def test14(self):
         self.qtsnk = qtgui.eye_sink_c(1024, 1, 1, None)
 
+
 if __name__ == '__main__':
-    gr_unittest.run(test_qtgui, "test_qtgui.xml")
+    gr_unittest.run(test_qtgui)
